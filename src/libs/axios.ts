@@ -8,7 +8,7 @@ const apiConfig = {
         'Accept': 'application/json'
     }
 }
-
+console.log('API URL:', apiConfig.baseURL);
 const axios = Axios.create(apiConfig)
 
 export default axios

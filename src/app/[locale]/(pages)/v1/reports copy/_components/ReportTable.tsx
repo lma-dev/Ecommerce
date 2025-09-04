@@ -8,6 +8,7 @@ import { useLocale } from "next-intl";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   Table,
@@ -17,22 +18,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRegularCostsQuery } from "@/features/regular-costs/api";
-import { createRegularCostColumns } from "./RegularCostTableColumns";
+import { useReportsQuery, useUpdateReport } from "@/features/reports/api";
+import { createReportColumns } from "./ReportTableColumns";
 import { PaginationFooter } from "@/app/[locale]/_components/ui/pagination-footer";
-import RegularCostFilterDropDown from "./RegularCostFilterDropDown";
+import ReportFilterDropDown from "./ReportFilterDropDown";
+import { useMutation } from "@tanstack/react-query";
+import { ConfirmStatusType } from "@/constants/ConfirmStatus";
 
 type DialogType = "delete" | null;
 
-interface RegularCostTableProps {
+interface ReportTableProps {
   showDialog: (type: DialogType, method: () => void) => void;
   t: any;
 }
 
-const RegularCostTable: React.FC<RegularCostTableProps> = ({
-  showDialog,
-  t,
-}) => {
+const ReportTable: React.FC<ReportTableProps> = ({ showDialog, t }) => {
   const [page, setPage] = useState(1);
   const [generalSearch, setGeneralSearch] = useState<string | undefined>(
     undefined
@@ -40,29 +40,68 @@ const RegularCostTable: React.FC<RegularCostTableProps> = ({
   const [amountFilter, setAmountFilter] = useState<number | undefined>(
     undefined
   );
-
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [type, setType] = useState<string | undefined>(undefined);
   const [createdAt, setCreatedAt] = useState<string | undefined>(undefined);
+  const [tab, setTab] = useState<"PENDING" | "ACCEPTED" | "REJECTED">(
+    "PENDING"
+  );
 
   const locale = useLocale();
+  const updateReport = useUpdateReport();
 
-  const { data, isLoading, refetch } = useRegularCostsQuery(page, {
+  const { data, isLoading, refetch } = useReportsQuery(page, {
     amount: amountFilter,
+    confirmStatus: statusFilter,
+    type,
     createdAt,
     generalSearch,
   });
 
-  const regularCostColumns = createRegularCostColumns(locale, showDialog, t);
+  const changeConfirmStatusMutation = useMutation({
+    mutationFn: ({
+      id,
+      confirmStatus,
+    }: {
+      id: number;
+      confirmStatus: ConfirmStatusType;
+    }) => updateReport.mutateAsync({ id, confirmStatus }),
+  });
+
+  const reportColumns = createReportColumns(
+    locale,
+    showDialog,
+    t,
+    changeConfirmStatusMutation
+  );
 
   const table = useReactTable({
     data: data?.data ?? [],
-    columns: regularCostColumns,
+    columns: reportColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <div>{t("loadingRegularCosts")}</div>;
+  if (isLoading) return <div>{t("loadingReports")}</div>;
 
   return (
     <div className="space-y-4">
+      <Tabs
+        value={tab}
+        onValueChange={(value) => {
+          setTab(value as any);
+          setStatusFilter(value);
+          setPage(1);
+          refetch();
+        }}
+      >
+        <TabsList>
+          <TabsTrigger value="PENDING">{t("uncheckedReports")}</TabsTrigger>
+          <TabsTrigger value="ACCEPTED">{t("acceptedReports")}</TabsTrigger>
+          <TabsTrigger value="REJECTED">{t("rejectedReports")}</TabsTrigger>
+        </TabsList>
+      </Tabs>
       <div className="flex justify-between items-center">
         <div className="flex gap-4">
           <Input
@@ -74,11 +113,17 @@ const RegularCostTable: React.FC<RegularCostTableProps> = ({
               refetch();
             }}
           />
-          <RegularCostFilterDropDown
+          <ReportFilterDropDown
             amount={Number(amountFilter) || 0}
+            type={type ?? ""}
             createdAt={createdAt ?? ""}
             onAmountChange={(val) => {
               setAmountFilter(val ? val : undefined);
+              setPage(1);
+              refetch();
+            }}
+            onTypeChange={(val) => {
+              setType(val || undefined);
               setPage(1);
               refetch();
             }}
@@ -91,10 +136,10 @@ const RegularCostTable: React.FC<RegularCostTableProps> = ({
           />
         </div>
         <Link
-          href={`/${locale}/v1/regular-costs/create`}
+          href={`/${locale}/v1/reports/create`}
           className="inline-flex items-center"
         >
-          <Button>{t("createRegularCost")}</Button>
+          <Button>{t("createReport")}</Button>
         </Link>
       </div>
 
@@ -139,4 +184,4 @@ const RegularCostTable: React.FC<RegularCostTableProps> = ({
   );
 };
 
-export default RegularCostTable;
+export default ReportTable;

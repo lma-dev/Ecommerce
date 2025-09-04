@@ -1,0 +1,57 @@
+# Node.js
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Output
+.next/
+out/
+dist/
+coverage/
+build/
+
+# Tailwind
+.tailwind/
+
+# dotenv
+.env*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Storybook
+.storybook-out/
+storybook-static/
+
+# Vercel
+.vercel/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# Sonner cache / shadcn/ui cache (if any)
+.shadcn/
+
+# Jest / Vitest
+jest.config.js
+vitest.config.ts
+coverage/
+
+# Turborepo / monorepo optional
+turbo/

@@ -56,7 +56,6 @@ async function handleError(error: any) {
 export async function callApi({ method, url, data, responseType = "json" }: CallApiParams) {
     try {
         const headers = await getAuthHeaders();
-
         const config = {
             method,
             url,

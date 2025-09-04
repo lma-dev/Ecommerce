@@ -9,39 +9,28 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-  MapPinned,
-  Download,
-  Pencil,
-  Trash2,
-  MoreVertical,
-} from "lucide-react";
-import Link from "next/link";
-import { useUserActionHandlers } from "@/features/users/hooks/useUserActionHandlers";
-import type { User } from "@/features/users/types";
+import { Pencil, Trash2, MoreVertical } from "lucide-react";
+import { useCategoryActionHandlers } from "@/features/categories/hooks/useCategoryActionHandlers";
+import type { Category } from "@/features/categories/types";
 import { useTranslations, useLocale } from "next-intl";
 
-type DialogType = "delete" | "export" | null;
+type DialogType = "delete" | null;
 
-interface UserActionDropdownProps {
-  user: User;
+interface CategoryActionDropdownProps {
+  category: Category;
   showDialog: (type: DialogType, method: () => void) => void;
 }
 
-export const UserActionDropdown: React.FC<UserActionDropdownProps> = ({
-  user,
+export const CategoryActionDropdown: React.FC<CategoryActionDropdownProps> = ({
+  category,
   showDialog,
 }) => {
   const locale = useLocale();
-  const { onEdit, onDelete, onExport } = useUserActionHandlers(user);
+  const { onEdit, onDelete } = useCategoryActionHandlers(category);
   const t = useTranslations("Translation");
 
   const handleDeleteClick = () => {
     showDialog("delete", onDelete);
-  };
-
-  const handleExportClick = () => {
-    showDialog("export", onExport);
   };
 
   return (
@@ -54,11 +43,6 @@ export const UserActionDropdown: React.FC<UserActionDropdownProps> = ({
 
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>{t("setting")}</DropdownMenuLabel>
-
-        <DropdownMenuItem onSelect={handleExportClick}>
-          <Download className="mr-2 h-4 w-4" />
-          {t("export")}
-        </DropdownMenuItem>
 
         {/* {(role === "ADMIN" || role === "SUPER_ADMIN") && ( */}
         <>

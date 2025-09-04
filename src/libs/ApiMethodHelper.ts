@@ -1,6 +1,6 @@
 import { callApi } from "@/libs/callApi";
 
-const defaultRoute = "/app";
+const defaultRoute = "/staff";
 
 export async function fetchAllData(url: string) {
   return await callApi({ method: "GET", url: defaultRoute + url });

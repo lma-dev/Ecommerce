@@ -9,23 +9,31 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, MoreVertical } from "lucide-react";
-import type { RegularCost } from "@/features/regular-costs/types";
+import {
+  MapPinned,
+  Download,
+  Pencil,
+  Trash2,
+  MoreVertical,
+} from "lucide-react";
+import Link from "next/link";
+import type { Report } from "@/features/reports/types";
 import { useTranslations, useLocale } from "next-intl";
-import { useRegularCostActionHandlers } from "@/features/regular-costs/hooks/useRegularCostActionHandlers";
+import { useReportActionHandlers } from "@/features/reports/hooks/useReportActionHandlers";
 
 type DialogType = "delete" | null;
 
-interface RegularCostActionDropdownProps {
-  regularCost: RegularCost;
+interface ReportActionDropdownProps {
+  report: Report;
   showDialog: (type: DialogType, method: () => void) => void;
 }
 
-export const RegularCostActionDropdown: React.FC<
-  RegularCostActionDropdownProps
-> = ({ regularCost, showDialog }) => {
+export const ReportActionDropdown: React.FC<ReportActionDropdownProps> = ({
+  report,
+  showDialog,
+}) => {
   const locale = useLocale();
-  const { onEdit, onDelete } = useRegularCostActionHandlers(regularCost);
+  const { onEdit, onDelete } = useReportActionHandlers(report);
   const t = useTranslations("Translation");
 
   const handleDeleteClick = () => {

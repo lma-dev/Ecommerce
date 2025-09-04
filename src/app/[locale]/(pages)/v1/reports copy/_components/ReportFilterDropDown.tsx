@@ -20,25 +20,30 @@ import {
 } from "@/components/ui/select";
 import { CurrencyType } from "@/constants/CurrencyType";
 
-interface RegularCostFilterDropDownType {
+interface ReportFilterDropDownType {
   amount?: number;
   createdAt?: string;
+  type?: string;
   onAmountChange: (amount: number) => void;
+  onTypeChange: (type: string) => void;
   onCreatedAtChange: (createdAt: string) => void;
   t: any;
 }
 
-export default function RegularCostFilterDropDown({
+export default function ReportFilterDropDown({
   amount,
+  type,
   createdAt,
   onAmountChange,
+  onTypeChange,
   onCreatedAtChange,
   t,
-}: RegularCostFilterDropDownType) {
+}: ReportFilterDropDownType) {
   const [open, setOpen] = useState(false);
 
   const handleClear = () => {
     onAmountChange(0);
+    onTypeChange("");
     onCreatedAtChange("");
   };
 
@@ -57,7 +62,7 @@ export default function RegularCostFilterDropDown({
         <div className="space-y-4">
           {/* Amount */}
           <div>
-            <label className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
+            <label className="text-sm font-medium text-gray-900 block mb-1">
               {t("amount")} ({CurrencyType.MMK})
             </label>
             <Input
@@ -68,9 +73,25 @@ export default function RegularCostFilterDropDown({
             />
           </div>
 
+          {/* Type */}
+          <div>
+            <label className="text-sm font-medium text-gray-900 block mb-1">
+              {t("type")}
+            </label>
+            <Select value={type} onValueChange={onTypeChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("select")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="INCOME">{t("income")}</SelectItem>
+                <SelectItem value="EXPENSE">{t("expense")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Date */}
           <div>
-            <label className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
+            <label className="text-sm font-medium text-gray-900 block mb-1">
               {t("createDate")}
             </label>
             <Input

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useCreateRegularCost,
-  useUpdateRegularCost,
-} from "@/features/regular-costs/api";
+import { useCreateReport, useUpdateReport } from "@/features/reports/api";
 import {
   FormControl,
   FormField,
@@ -22,14 +19,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createRegularCostSchema } from "@/features/regular-costs/schemas/createRegularCostSchema";
-import { updateRegularCostSchema } from "@/features/regular-costs/schemas/updateRegularCostSchema";
+import { createReportSchema } from "@/features/reports/schemas/createReportSchema";
+import { updateReportSchema } from "@/features/reports/schemas/updateReportSchema";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
 import { useLocale } from "next-intl";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
 
-const RegularCostForm = ({
+const ReportForm = ({
   mode,
   defaultValues,
   t,
@@ -42,17 +39,20 @@ const RegularCostForm = ({
 
   const form = useForm({
     resolver: zodResolver(
-      mode === "edit" ? updateRegularCostSchema : createRegularCostSchema
+      mode === "edit" ? updateReportSchema : createReportSchema
     ),
     defaultValues: defaultValues ?? {
       amount: 1000,
+      confirmStatus: "PENDING",
+      type: "INCOME",
       description: "",
+      verifier_id: undefined,
     },
   });
 
   const locale = useLocale();
-  const create = useCreateRegularCost();
-  const update = useUpdateRegularCost();
+  const create = useCreateReport();
+  const update = useUpdateReport();
 
   const onSubmit = async (values: any) => {
     if (isReadOnly) return;
@@ -63,18 +63,14 @@ const RegularCostForm = ({
           { id: defaultValues.id, ...values },
           {
             onSuccess: () => {
-              ToastAlert.success({
-                message: "RegularCost updated successfully",
-              });
+              ToastAlert.success({ message: "Report updated successfully" });
             },
           }
         );
       } else {
         await create.mutateAsync(values, {
           onSuccess: () => {
-            ToastAlert.success({
-              message: "RegularCost created successfully",
-            });
+            ToastAlert.success({ message: "Report created successfully" });
           },
         });
       }
@@ -112,6 +108,61 @@ const RegularCostForm = ({
           )}
         />
 
+        {/* Confirm Status */}
+        <FormField
+          control={form.control}
+          name="confirmStatus"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("confirmStatus")}</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isReadOnly}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectStatus")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PENDING">{t("pending")}</SelectItem>
+                    <SelectItem value="ACCEPTED">{t("accept")}</SelectItem>
+                    <SelectItem value="REJECTED">{t("reject")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage className="text-red-600" />
+            </FormItem>
+          )}
+        />
+
+        {/* Type */}
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("type")}</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isReadOnly}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectType")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INCOME">{t("income")}</SelectItem>
+                    <SelectItem value="EXPENSE">{t("expense")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage className="text-red-600" />
+            </FormItem>
+          )}
+        />
+
         {/* Description */}
         <FormField
           control={form.control}
@@ -135,7 +186,7 @@ const RegularCostForm = ({
         {/* Buttons */}
         <div className="flex justify-between items-center">
           <CustomLink
-            href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/regular-costs`}
+            href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/reports`}
           >
             {t("back")}
           </CustomLink>
@@ -143,9 +194,7 @@ const RegularCostForm = ({
           {/* Only show submit button if not in "show" mode */}
           {!isReadOnly && (
             <FormSubmitButton
-              text={
-                mode === "edit" ? t("editRegularCost") : t("createRegularCost")
-              }
+              text={mode === "edit" ? t("updateReport") : t("createReport")}
             />
           )}
         </div>
@@ -154,4 +203,4 @@ const RegularCostForm = ({
   );
 };
 
-export default RegularCostForm;
+export default ReportForm;

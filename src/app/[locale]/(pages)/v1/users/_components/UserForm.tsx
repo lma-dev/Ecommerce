@@ -9,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserSchema } from "@/features/users/schemas/createUserSchema";
 import { updateUserSchema } from "@/features/users/schemas/updateUserSchema";
@@ -18,6 +17,15 @@ import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
 import { useLocale } from "next-intl";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
+import {
+  userRoleLabel,
+  userRoleOptions,
+  UserRoleType,
+} from "@/features/users/constants/role";
+import {
+  userAccountStatusOptions,
+  UserAccountStatusType,
+} from "@/features/users/constants/status";
 
 // --- Shared UserForm Component ---
 const UserForm = ({
@@ -34,7 +42,7 @@ const UserForm = ({
     defaultValues: defaultValues ?? {
       name: "",
       email: "",
-      role: "MEMBER",
+      role: "STAFF",
       accountStatus: "ACTIVE",
       password: "",
     },
@@ -66,39 +74,58 @@ const UserForm = ({
       <Input {...form.register("name")} placeholder="Name" />
       <Input {...form.register("email")} placeholder="Email" />
 
-      <Select
-        defaultValue={form.getValues("role")}
-        onValueChange={(value) => form.setValue("role", value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Role" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ADMIN">Admin</SelectItem>
-          <SelectItem value="MEMBER">Member</SelectItem>
-          <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-        </SelectContent>
-      </Select>
+      <Controller
+        name="role"
+        control={form.control}
+        render={({ field }) => (
+          <Select
+            value={field.value ?? undefined}
+            onValueChange={(v) => field.onChange(v as UserRoleType)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent>
+              {userRoleOptions.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {userRoleLabel[role]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
 
-      <Select
-        defaultValue={form.getValues("accountStatus")}
-        onValueChange={(value) => form.setValue("accountStatus", value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ACTIVE">Active</SelectItem>
-          <SelectItem value="SUSPENDED">Suspended</SelectItem>
-        </SelectContent>
-      </Select>
+      <Controller
+        name="accountStatus"
+        control={form.control}
+        render={({ field }) => (
+          <Select
+            value={field.value ?? undefined}
+            onValueChange={(v) => field.onChange(v as UserAccountStatusType)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {userAccountStatusOptions.map((st) => (
+                <SelectItem key={st} value={st}>
+                  {st === "ACTIVE" ? "ACTIVE" : "SUSPENDED"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
 
       {mode === "create" && (
-        <Input
-          type="password"
-          {...form.register("password")}
-          placeholder="Password"
-        />
+        <div>
+          <Input
+            type="password"
+            {...form.register("password")}
+            placeholder="Password"
+          />
+        </div>
       )}
       <div className="flex justify-between items-center">
         <CustomLink

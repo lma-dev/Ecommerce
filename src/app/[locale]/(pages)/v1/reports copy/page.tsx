@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ConfirmDialog } from "@/app/[locale]/_components/ui/confirm-dialog";
-import RegularCostTable from "@/app/[locale]/(pages)/v1/regular-costs/_components/RegularCostTable";
+import ReportTable from "@/v1/reports/_components/ReportTable";
 
 type DialogType = "delete" | null;
 
@@ -13,7 +13,7 @@ interface DialogState {
   method: (() => void) | null;
 }
 
-const regularCostPage = () => {
+const reportPage = () => {
   const [dialog, setDialog] = useState<DialogState>({
     open: false,
     type: null,
@@ -41,8 +41,8 @@ const regularCostPage = () => {
   return (
     <div>
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">{t("regularCost")}</h1>
-        <RegularCostTable showDialog={showDialog} t={t} />
+        <h1 className="text-2xl font-semibold">Report Lists</h1>
+        <ReportTable showDialog={showDialog} t={t} />
       </div>
       {dialog.type && (
         <ConfirmDialog
@@ -57,4 +57,4 @@ const regularCostPage = () => {
   );
 };
 
-export default regularCostPage;
+export default reportPage;

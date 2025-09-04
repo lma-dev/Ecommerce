@@ -23,100 +23,69 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useUsersQuery } from "@/features/users/api";
-import { createUserColumns } from "./UserTableColumns";
+import { useCategoriesQuery } from "@/features/categories/api";
 import { PaginationFooter } from "@/app/[locale]/_components/ui/pagination-footer";
 import {
-  userRoleLabel,
-  userRoleOptions,
-  UserRoleType,
-} from "@/features/users/constants/role";
-import {
-  userAccountStatusOptions,
-  UserAccountStatusType,
-} from "@/features/users/constants/status";
+  categoryStatusOptions,
+  CategoryStatusType,
+} from "@/features/categories/constants/status";
+import { createCategoryColumns } from "./CategoryTableColumns";
 
-type DialogType = "delete" | "export" | null;
-type RoleSelectValue = UserRoleType | "clear";
-type StatusSelectValue = UserAccountStatusType | "clear";
+type DialogType = "delete" | null;
+// include 'clear' explicitly; keep it as the Select's value type
+type StatusSelectValue = CategoryStatusType | "clear";
 
-interface UserTableProps {
+interface CategoryTableProps {
   showDialog: (type: DialogType, method: () => void) => void;
-  t: any; // Translation function
+  t: any;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
+const CategoryTable: React.FC<CategoryTableProps> = ({ showDialog, t }) => {
   const [page, setPage] = useState(1);
 
-  // local-only filters (no refetch)
-  const [roleFilter, setRoleFilter] = useState<RoleSelectValue>("clear");
+  // 👇 status is local-only; no refetch
   const [statusFilter, setStatusFilter] = useState<StatusSelectValue>("clear");
 
-  // search: draft vs committed
+  // search has a "draft" input and a "committed" value (used by the query)
   const [searchFilter, setSearchFilter] = useState("");
   const [committedSearch, setCommittedSearch] = useState("");
 
   const locale = useLocale();
 
-  // backend query: only page + committed search drive it
-  const { data, isLoading } = useUsersQuery(page, {
-    role: undefined, // keep unfiltered on backend
-    generalSearch: committedSearch || undefined,
-    accountStatus: undefined, // keep unfiltered on backend
+  const { data, isLoading } = useCategoriesQuery(page, {
+    name: committedSearch || undefined,
+    isActive: undefined, // keep unfiltered on backend
   });
 
-  const userColumns = createUserColumns(showDialog);
+  const categoryColumns = createCategoryColumns(showDialog);
 
-  // client-side role + status filtering
   const filteredRows = useMemo(() => {
     const rows = data?.data ?? [];
-    return rows.filter((u: any) => {
-      const roleOk = roleFilter === "clear" || u.role === roleFilter;
-      const statusOk =
-        statusFilter === "clear" || u.accountStatus === statusFilter;
-      return roleOk && statusOk;
-    });
-  }, [data?.data, roleFilter, statusFilter]);
+    if (statusFilter === "clear") return rows;
+    return rows.filter((r: any) => r.isActive === statusFilter);
+  }, [data?.data, statusFilter]);
 
   const table = useReactTable({
     data: filteredRows,
-    columns: userColumns,
+    columns: categoryColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <div>{t("loadingUsers")}</div>;
+  if (isLoading) return <div>{t("loadingCategories")}</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by name or email"
+            placeholder="Search by name"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            onBlur={() => setCommittedSearch(searchFilter)}
+            onBlur={() => setCommittedSearch(searchFilter)} // refetch only when committed
             onKeyDown={(e) => {
               if (e.key === "Enter") setCommittedSearch(searchFilter);
             }}
           />
-
-          <Select
-            value={roleFilter}
-            onValueChange={(val) => setRoleFilter(val as RoleSelectValue)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Role" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="clear">All Roles</SelectItem>
-              {userRoleOptions.map((role) => (
-                <SelectItem key={role} value={role}>
-                  {userRoleLabel[role]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           <Select
             value={statusFilter}
@@ -128,9 +97,10 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
 
             <SelectContent>
               <SelectItem value="clear">{t("allStatuses")}</SelectItem>
-              {userAccountStatusOptions.map((status) => (
+
+              {categoryStatusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
-                  {status === "ACTIVE" ? t("active") : t("suspend")}
+                  {status === "ACTIVE" ? t("active") : t("inactive")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -138,10 +108,10 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
         </div>
 
         <Link
-          href={`/${locale}/v1/users/create`}
+          href={`/${locale}/v1/categories/create`}
           className="inline-flex items-center"
         >
-          <Button>{t("createUser")}</Button>
+          <Button>{t("createCategory")}</Button>
         </Link>
       </div>
 
@@ -186,4 +156,4 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
   );
 };
 
-export default UserTable;
+export default CategoryTable;
