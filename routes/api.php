@@ -29,7 +29,3 @@ Route::prefix('customer')
     ->group(function () {
         require __DIR__ . '/api/customers.php';
     });
-
-// ---- Public READ for products & categories (both customers and staff can GET) ----
-Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);

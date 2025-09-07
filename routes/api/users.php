@@ -1,11 +1,11 @@
 <?php
 // Menu: allow any authenticated customer via Policy
 
-use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\CustomerController;
-use App\Http\Controllers\Api\V1\OrderController;
-use App\Http\Controllers\Api\V1\ProductController;
-use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\Admin\CategoryController;
+use App\Http\Controllers\Api\V1\Admin\CustomerController;
+use App\Http\Controllers\Api\V1\Admin\OrderController;
+use App\Http\Controllers\Api\V1\Admin\ProductController;
+use App\Http\Controllers\Api\V1\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource("users", UserController::class)->only(['index', 'show', 'store', 'update', 'destroy'])
