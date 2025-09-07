@@ -30,7 +30,7 @@ class GetProductAction
         $categoryId    = $validatedData['categoryId'] ?? null;
 
         $products = Product::query()
-            ->select(['id', 'name', 'price', 'discount', 'category_id', 'is_active', 'created_at'])
+            ->select(['id', 'name', 'price', 'category_id', 'is_active', 'created_at'])
             ->with([
                 'category:id,name',                // limit columns on relations too
                 'image:id,product_id,url',

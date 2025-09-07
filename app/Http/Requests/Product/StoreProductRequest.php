@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\VisibilityStatusType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest
 {
@@ -25,8 +27,8 @@ class StoreProductRequest extends FormRequest
             'name'        => 'required|string|max:255|unique:products,name',
             'price'       => 'required|numeric|min:0',
             'categoryId' => 'required|integer|exists:categories,id',
-            'isActive'   => 'required|boolean',
-            'image'       => 'sometimes|url',
+            'isActive'    => ['sometimes', 'string', Rule::in(VisibilityStatusType::getAllStatuses())],
+            'image'       => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'sometimes|string|max:1000',
         ];
     }

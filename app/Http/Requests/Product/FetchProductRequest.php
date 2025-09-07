@@ -11,7 +11,7 @@ class FetchProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -26,6 +26,7 @@ class FetchProductRequest extends FormRequest
             'page' => ['nullable', 'integer'],
             'name' => ['nullable', 'string'],
             'categoryId' => ['nullable', 'integer'],
+            "isActive" => ['nullable', 'string'],
         ];
     }
 }

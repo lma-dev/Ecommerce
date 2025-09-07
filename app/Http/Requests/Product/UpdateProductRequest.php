@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\VisibilityStatusType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -22,11 +24,17 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'sometimes|string|max:255|unique:products,name,' .  $this->product->id,
+            'name' => [
+                'sometimes',
+                'string',
+                'max:255',
+                Rule::unique('products', 'name')->ignore($this->route('product')?->id),
+            ],
             'price'       => 'sometimes|numeric|min:0',
-            'categoryId' => 'required|integer|exists:categories,id',
-            'isActive'   => 'required|boolean',
-            'image'       => 'sometimes|url',
+            // Allow partial updates without forcing categoryId each time
+            'categoryId'  => 'sometimes|integer|exists:categories,id',
+            'isActive'    => ['sometimes', 'string', Rule::in(VisibilityStatusType::getAllStatuses())],
+            'image'       => ['nullable', 'file', 'image', 'max:2048'],
             'description' => 'sometimes|string|max:1000',
         ];
     }

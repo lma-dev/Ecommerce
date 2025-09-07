@@ -4,6 +4,8 @@ namespace App\UseCases\Product;
 
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
 
 class StoreProductAction
 {
@@ -22,7 +24,25 @@ class StoreProductAction
             ]);
 
             if ($image) {
-                $product->image()->create(['url' => $image]);
+                $imageUrl = null;
+
+                if ($image instanceof UploadedFile) {
+                    $directory = public_path('uploads/products');
+                    if (! File::exists($directory)) {
+                        File::makeDirectory($directory, 0755, true);
+                    }
+
+                    $filename = uniqid('product_') . '.' . $image->getClientOriginalExtension();
+                    $image->move($directory, $filename);
+
+                    // Store relative path under public folder
+                    $imageUrl = '/uploads/products/' . $filename;
+                } else {
+                    // If a string URL is provided (e.g., from seeder), keep as-is
+                    $imageUrl = (string) $image;
+                }
+
+                $product->image()->create(['url' => $imageUrl]);
             }
 
             return $product->load('image');

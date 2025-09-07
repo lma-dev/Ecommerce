@@ -8,6 +8,6 @@ class DetailProductAction
 {
     public function __invoke(Product $product)
     {
-        return $product->load('image');
+        return $product->load(['image', 'category']);
     }
 }

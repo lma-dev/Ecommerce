@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('price');
             $table->text('description')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->boolean('is_active')->default(true);
+            $table->enum('is_active', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
             $table->softDeletes();
             $table->timestamps();
         });

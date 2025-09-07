@@ -4,6 +4,8 @@ namespace App\UseCases\Product;
 
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
 
 class UpdateProductAction
 {
@@ -25,15 +27,31 @@ class UpdateProductAction
 
             if ($image !== null) {
                 if ($image) {
+                    $imageUrl = null;
+
+                    if ($image instanceof UploadedFile) {
+                        $directory = public_path('uploads/products');
+                        if (! File::exists($directory)) {
+                            File::makeDirectory($directory, 0755, true);
+                        }
+
+                        $filename = uniqid('product_') . '.' . $image->getClientOriginalExtension();
+                        $image->move($directory, $filename);
+
+                        $imageUrl = '/uploads/products/' . $filename;
+                    } else {
+                        $imageUrl = (string) $image;
+                    }
+
                     // upsert single image
-                    $product->image()->updateOrCreate([], ['url' => $image]);
+                    $product->image()->updateOrCreate([], ['url' => $imageUrl]);
                 } else {
                     // remove image
                     $product->image()->delete();
                 }
             }
 
-            return $product->load('image');
+            return $product->refresh()->load(['image', 'category']);
         });
     }
 }
