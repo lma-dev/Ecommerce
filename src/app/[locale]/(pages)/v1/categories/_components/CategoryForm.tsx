@@ -24,6 +24,7 @@ import {
   categoryStatusOptions,
   CategoryStatusType,
 } from "@/features/categories/constants/status";
+import { Textarea } from "@/components/ui/textarea";
 
 // --- Shared CategoryForm Component ---
 const CategoryForm = ({
@@ -68,7 +69,7 @@ const CategoryForm = ({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <Input {...form.register("name")} placeholder="Name" />
-      <Input {...form.register("description")} placeholder="Description" />
+      <Textarea {...form.register("description")} placeholder="Description" />
 
       <Controller
         name="isActive"

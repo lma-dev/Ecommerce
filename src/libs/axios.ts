@@ -4,7 +4,7 @@ const apiConfig = {
     baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
 }

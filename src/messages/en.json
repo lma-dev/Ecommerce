@@ -55,6 +55,7 @@
     "category": "Category",
     "createdDate": "Created Date",
     "createCategory": "Create Category",
+    "createProduct": "Create Product",
 
     "deposit": "Deposit",
     "depositRequest": "Deposit Request",
@@ -119,6 +120,7 @@
     "loadingUsers": "Loading users...",
     "loadingReports": "Loading reports...",
     "loadingCategories": "Loading categories...",
+    "loadingProducts": "Loading products...",
 
     "member": "Member",
     "message": "Message",

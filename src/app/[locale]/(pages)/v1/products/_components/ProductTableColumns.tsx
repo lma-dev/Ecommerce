@@ -1,15 +1,15 @@
 "use client";
 
 import { ActiveBadge } from "@/app/[locale]/_components/ui/visibility-badge";
-import { Category } from "@/features/categories/types";
-import { CategoryActionDropdown } from "@/v1/categories/_components/CategoryActionsDropdown";
+import { Product } from "@/features/products/types";
+import { ProductActionsDropdown } from "@/v1/products/_components/ProductActionsDropdown";
 import { ColumnDef } from "@tanstack/react-table";
 
 type DialogType = "delete" | null;
 
-export const createCategoryColumns = (
+export const createProductColumns = (
   showDialog: (type: DialogType, method: () => void) => void
-): ColumnDef<Category>[] => [
+): ColumnDef<Product>[] => [
   {
     accessorKey: "name",
     header: "Name",
@@ -22,16 +22,22 @@ export const createCategoryColumns = (
     ),
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "price",
+    header: "Price",
+  },
+  {
+    accessorFn: (row) => row.category?.name ?? "",
+    id: "categoryName",
+    header: () => "Category",
+    cell: (info) => info.getValue(),
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }: { row: any }) => {
-      const category = row.original;
+      const product = row.original;
       return (
-        <CategoryActionDropdown category={category} showDialog={showDialog} />
+        <ProductActionsDropdown product={product} showDialog={showDialog} />
       );
     },
   },

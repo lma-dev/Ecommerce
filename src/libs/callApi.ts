@@ -56,12 +56,14 @@ async function handleError(error: any) {
 export async function callApi({ method, url, data, responseType = "json" }: CallApiParams) {
     try {
         const headers = await getAuthHeaders();
+        // Only set Content-Type for JSON, not FormData
+        const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
         const config = {
             method,
             url,
             data,
             responseType,
-            headers,
+            headers: isFormData ? headers : { ...headers, 'Content-Type': 'application/json' },
         };
 
         const response = await axios(config);
