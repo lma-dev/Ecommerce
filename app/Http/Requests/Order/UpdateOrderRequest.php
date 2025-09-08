@@ -24,7 +24,7 @@ class UpdateOrderRequest extends FormRequest
         return [
             'customerId'  => 'sometimes|integer|exists:customers,id',
             'status'       => 'sometimes|string|max:50',
-            'notes'        => 'sometimes|string|max:1000',
+            'notes'        => 'nullable|string|max:1000',
             'shippingAddress' => 'sometimes|string|max:2000',
             'productIds'  => 'sometimes|array|min:1',
             'productIds.*' => 'integer|exists:products,id',

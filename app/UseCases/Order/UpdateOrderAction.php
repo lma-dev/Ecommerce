@@ -27,7 +27,7 @@ class UpdateOrderAction
                 'shipping_address' => $shippingAddress,
             ], fn($v) => !is_null($v)));
 
-            if (array_key_exists('product_ids', $data)) {
+            if (array_key_exists('productIds', $data)) {
                 $productIds = array_values(array_unique($productIds));
                 $order->products()->sync($productIds);
             } else {

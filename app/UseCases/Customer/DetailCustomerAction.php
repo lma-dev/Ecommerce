@@ -6,8 +6,8 @@ use App\Models\Customer;
 
 class DetailCustomerAction
 {
-    public function __invoke(Customer $Customer)
+    public function __invoke(Customer $customer): Customer
     {
-        return $Customer;
+        return $customer;
     }
 }

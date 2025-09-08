@@ -6,11 +6,11 @@ use App\Models\Customer;
 
 class DeleteCustomerAction
 {
-    public function __invoke(Customer $Customer): Customer
+    public function __invoke(Customer $customer): Customer
     {
         // Business logic to delete a Customer by ID
         // For example:
-        $Customer->delete();
-        return $Customer;
+        $customer->delete();
+        return $customer;
     }
 }
