@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createCategorySchema } from "@/features/categories/schemas/createCategorySchema";
 import { updateCategorySchema } from "@/features/categories/schemas/updateCategorySchema";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
 import {
@@ -45,6 +45,7 @@ const CategoryForm = ({
     },
   });
   const locale = useLocale();
+  const t = useTranslations("Translation");
 
   const create = useCreateCategory();
   const update = useUpdateCategory();
@@ -55,21 +56,21 @@ const CategoryForm = ({
         { id: defaultValues.id, ...values },
         {
           onSuccess: () =>
-            ToastAlert.success({ message: "Category updated successfully" }),
+            ToastAlert.success({ message: t("updateSuccess") }),
         }
       );
     } else {
       create.mutate(values, {
         onSuccess: () =>
-          ToastAlert.success({ message: "Category created successfully" }),
+          ToastAlert.success({ message: t("createSuccess") }),
       });
     }
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input {...form.register("name")} placeholder="Name" />
-      <Textarea {...form.register("description")} placeholder="Description" />
+      <Input {...form.register("name")} placeholder={t("name")} />
+      <Textarea {...form.register("description")} placeholder={t("description")} />
 
       <Controller
         name="isActive"
@@ -80,12 +81,12 @@ const CategoryForm = ({
             onValueChange={(v) => field.onChange(v as CategoryStatusType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Release state" />
+              <SelectValue placeholder={t("selectStatus")} />
             </SelectTrigger>
             <SelectContent>
               {categoryStatusOptions.map((st) => (
                 <SelectItem key={st} value={st}>
-                  {st === "ACTIVE" ? "ACTIVE" : "INACTIVE"}
+                  {st === "ACTIVE" ? t("active") : t("inactive")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -96,10 +97,10 @@ const CategoryForm = ({
         <CustomLink
           href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/categories`}
         >
-          Back
+          {t("back")}
         </CustomLink>
         <FormSubmitButton
-          text={mode === "edit" ? "Update Category" : "Create Category"}
+          text={mode === "edit" ? t("updateCategory") : t("createCategory")}
         />
       </div>
     </form>

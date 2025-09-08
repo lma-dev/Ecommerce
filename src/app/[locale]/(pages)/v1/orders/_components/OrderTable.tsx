@@ -51,7 +51,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
     customerName: committedSearch || undefined,
   });
 
-  const columns = createOrderColumns(showDialog);
+  const columns = createOrderColumns(showDialog, t);
 
   const filteredRows = useMemo(() => {
     const rows = data?.data ?? [];
@@ -72,7 +72,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by customer"
+            placeholder={t("searchByCustomer")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             onBlur={() => setCommittedSearch(searchFilter)}
@@ -90,7 +90,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="clear">All statuses</SelectItem>
+              <SelectItem value="clear">{t("allStatuses")}</SelectItem>
 
               {orderStatusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
@@ -105,7 +105,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
           href={`/${locale}/v1/orders/create`}
           className="inline-flex items-center"
         >
-          <Button>Create Order</Button>
+          <Button>{t("createOrder")}</Button>
         </Link>
       </div>
 
@@ -151,4 +151,3 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
 };
 
 export default OrderTable;
-

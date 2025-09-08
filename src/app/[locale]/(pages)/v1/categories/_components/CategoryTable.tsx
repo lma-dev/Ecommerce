@@ -57,7 +57,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ showDialog, t }) => {
     isActive: undefined, // keep unfiltered on backend
   });
 
-  const categoryColumns = createCategoryColumns(showDialog);
+  const categoryColumns = createCategoryColumns(showDialog, t);
 
   const filteredRows = useMemo(() => {
     const rows = data?.data ?? [];
@@ -78,7 +78,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ showDialog, t }) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by name"
+            placeholder={t("searchByName")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             onBlur={() => setCommittedSearch(searchFilter)} // refetch only when committed

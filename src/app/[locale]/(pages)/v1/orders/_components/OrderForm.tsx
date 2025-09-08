@@ -24,7 +24,7 @@ import { useProductsQuery } from "@/features/products/api";
 import { useCustomersQuery } from "@/features/customers/api";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { Button } from "@/components/ui/button";
 
@@ -60,6 +60,7 @@ const OrderForm = ({
   });
 
   const locale = useLocale();
+  const t = useTranslations("Translation");
   const create = useCreateOrder();
   const update = useUpdateOrder();
 
@@ -102,7 +103,7 @@ const OrderForm = ({
             onValueChange={(v) => field.onChange(Number(v))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Customer" />
+              <SelectValue placeholder={t("selectCustomer")} />
             </SelectTrigger>
             <SelectContent>
               {(customersRes?.data ?? []).map((c: any) => (
@@ -125,7 +126,7 @@ const OrderForm = ({
             onValueChange={(v) => field.onChange(v as OrderStatusType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Status" />
+              <SelectValue placeholder={t("selectStatus")} />
             </SelectTrigger>
             <SelectContent>
               {orderStatusOptions.map((st) => (
@@ -141,18 +142,18 @@ const OrderForm = ({
       {/* Shipping Address */}
       <Textarea
         {...form.register("shippingAddress")}
-        placeholder="Shipping Address"
+        placeholder={t("shippingAddress")}
       />
 
       {/* Notes */}
-      <Textarea {...form.register("notes")} placeholder="Notes (optional)" />
+      <Textarea {...form.register("notes")} placeholder={t("notesOptional")} />
 
       {/* Products - searchable, paginated list for large datasets */}
       <div className="space-y-2">
-        <div className="font-medium">Products</div>
+        <div className="font-medium">{t("products")}</div>
         <div className="flex gap-2 items-center">
           <Input
-            placeholder="Search products"
+            placeholder={t("searchProducts")}
             value={productSearch}
             onChange={(e) => setProductSearch(e.target.value)}
             onKeyDown={(e) => {
@@ -167,7 +168,7 @@ const OrderForm = ({
 
         <div className="border rounded max-h-64 overflow-auto p-2">
           {isLoadingProducts ? (
-            <div className="p-2 text-sm">Loading products...</div>
+            <div className="p-2 text-sm">{t("loadingProducts")}</div>
           ) : (
             (productsRes?.data ?? []).map((p: any) => {
               const checked = (form.watch("productIds") ?? []).includes(p.id);
@@ -196,7 +197,7 @@ const OrderForm = ({
 
         <div className="flex items-center justify-between text-sm">
           <div>
-            Page {productPage} of {productsRes?.meta?.totalPages ?? 1}
+            {t("page")} {productPage} {t("of")} {productsRes?.meta?.totalPages ?? 1}
           </div>
           <div className="flex gap-2">
             <Button
@@ -206,7 +207,7 @@ const OrderForm = ({
               onClick={() => setProductPage((p) => Math.max(1, p - 1))}
               disabled={productPage <= 1}
             >
-              Prev
+              {t("previous")}
             </Button>
             <Button
               type="button"
@@ -219,16 +220,16 @@ const OrderForm = ({
               }
               disabled={productPage >= (productsRes?.meta?.totalPages ?? 1)}
             >
-              Next
+              {t("next")}
             </Button>
           </div>
         </div>
       </div>
 
       <div className="flex justify-between items-center">
-        <CustomLink href={`/${locale}/v1/orders`}>Back</CustomLink>
+        <CustomLink href={`/${locale}/v1/orders`}>{t("back")}</CustomLink>
         <FormSubmitButton
-          text={mode === "edit" ? "Update Order" : "Create Order"}
+          text={mode === "edit" ? t("updateOrder") : t("createOrder")}
         />
       </div>
     </form>

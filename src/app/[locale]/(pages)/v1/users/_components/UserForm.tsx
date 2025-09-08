@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserSchema } from "@/features/users/schemas/createUserSchema";
 import { updateUserSchema } from "@/features/users/schemas/updateUserSchema";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
 import {
@@ -48,6 +48,7 @@ const UserForm = ({
     },
   });
   const locale = useLocale();
+  const t = useTranslations("Translation");
 
   const create = useCreateUser();
   const update = useUpdateUser();
@@ -58,21 +59,21 @@ const UserForm = ({
         { id: defaultValues.id, ...values },
         {
           onSuccess: () =>
-            ToastAlert.success({ message: "User updated successfully" }),
+            ToastAlert.success({ message: t("updateSuccess") }),
         }
       );
     } else {
       create.mutate(values, {
         onSuccess: () =>
-          ToastAlert.success({ message: "User created successfully" }),
+          ToastAlert.success({ message: t("createSuccess") }),
       });
     }
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input {...form.register("name")} placeholder="Name" />
-      <Input {...form.register("email")} placeholder="Email" />
+      <Input {...form.register("name")} placeholder={t("name")} />
+      <Input {...form.register("email")} placeholder={t("email")} />
 
       <Controller
         name="role"
@@ -83,7 +84,7 @@ const UserForm = ({
             onValueChange={(v) => field.onChange(v as UserRoleType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Role" />
+              <SelectValue placeholder={t("selectRole")} />
             </SelectTrigger>
             <SelectContent>
               {userRoleOptions.map((role) => (
@@ -105,12 +106,12 @@ const UserForm = ({
             onValueChange={(v) => field.onChange(v as UserAccountStatusType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Status" />
+              <SelectValue placeholder={t("selectStatus")} />
             </SelectTrigger>
             <SelectContent>
               {userAccountStatusOptions.map((st) => (
                 <SelectItem key={st} value={st}>
-                  {st === "ACTIVE" ? "ACTIVE" : "SUSPENDED"}
+                  {st === "ACTIVE" ? t("active") : t("suspend")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -123,7 +124,7 @@ const UserForm = ({
           <Input
             type="password"
             {...form.register("password")}
-            placeholder="Password"
+            placeholder={t("password")}
           />
         </div>
       )}
@@ -131,10 +132,10 @@ const UserForm = ({
         <CustomLink
           href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/users`}
         >
-          Back
+          {t("back")}
         </CustomLink>
         <FormSubmitButton
-          text={mode === "edit" ? "Update User" : "Create User"}
+          text={mode === "edit" ? t("updateUser") : t("createUser")}
         />
       </div>
     </form>

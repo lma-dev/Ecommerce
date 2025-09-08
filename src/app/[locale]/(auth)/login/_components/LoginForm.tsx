@@ -47,7 +47,7 @@ export default function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("email")}</FormLabel>
               <FormControl>
                 <Input type="email" {...field} />
               </FormControl>
@@ -60,7 +60,7 @@ export default function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t("password")}</FormLabel>
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
@@ -69,12 +69,10 @@ export default function LoginForm() {
           )}
         />
         {error && (
-          <p className="text-sm text-red-500">
-            Login failed. Please check your credentials.
-          </p>
+          <p className="text-sm text-red-500">{t("loginFailed")}</p>
         )}
         <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Logging in..." : "Login"}
+          {isPending ? t("loggingIn") : t("login")}
         </Button>
       </form>
     </Form>

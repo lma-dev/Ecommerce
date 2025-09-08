@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import BreadCrumb from "@/app/[locale]/_components/ui/bread-crumb";
 import ProductForm from "../../_components/ProductForm";
 import { useProductQuery } from "@/features/products/api";
@@ -8,9 +9,10 @@ import { useProductQuery } from "@/features/products/api";
 export default function ProductEditPage() {
   const { id } = useParams();
   const { data: product, isLoading } = useProductQuery(Number(id));
+  const t = useTranslations("Translation");
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!product) return <div>Product not found</div>;
+  if (isLoading) return <div>{t("loadingProducts")}</div>;
+  if (!product) return <div>{t("productNotFound", { default: "Product not found" })}</div>;
 
   return (
     <div>

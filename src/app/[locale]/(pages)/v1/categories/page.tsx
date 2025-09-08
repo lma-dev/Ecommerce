@@ -41,7 +41,7 @@ const CategoryPage = () => {
   return (
     <div>
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">Category Lists</h1>
+        <h1 className="text-2xl font-semibold">{t("categoryList")}</h1>
         <CategoryTable showDialog={showDialog} t={t} />
       </div>
       {dialog.type && (

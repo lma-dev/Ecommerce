@@ -9,7 +9,8 @@ import { OrderActionsDropdown } from "@/v1/orders/_components/OrderActionsDropdo
 type DialogType = "delete" | null;
 
 export const createOrderColumns = (
-  showDialog: (type: DialogType, method: () => void) => void
+  showDialog: (type: DialogType, method: () => void) => void,
+  t: any
 ): ColumnDef<Order>[] => [
   {
     accessorKey: "id",
@@ -18,24 +19,24 @@ export const createOrderColumns = (
   {
     accessorFn: (row) => row.customer?.name ?? "",
     id: "customerName",
-    header: () => "Customer",
+    header: () => t("customer"),
     cell: (info) => info.getValue(),
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => t("status"),
   },
   {
     accessorKey: "totalAmount",
-    header: "Total",
+    header: () => t("total"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: () => t("created"),
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }: { row: any }) => {
       const order = row.original as Order;
       return <OrderActionsDropdown order={order} showDialog={showDialog} />;

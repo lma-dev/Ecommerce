@@ -8,32 +8,33 @@ import { ColumnDef } from "@tanstack/react-table";
 type DialogType = "delete" | null;
 
 export const createProductColumns = (
-  showDialog: (type: DialogType, method: () => void) => void
+  showDialog: (type: DialogType, method: () => void) => void,
+  t: any
 ): ColumnDef<Product>[] => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => t("name"),
   },
   {
     accessorKey: "isActive",
-    header: "Status",
+    header: () => t("status"),
     cell: ({ row }) => (
       <ActiveBadge value={row.getValue("isActive") as string | null} />
     ),
   },
   {
     accessorKey: "price",
-    header: "Price",
+    header: () => t("price"),
   },
   {
     accessorFn: (row) => row.category?.name ?? "",
     id: "categoryName",
-    header: () => "Category",
+    header: () => t("category"),
     cell: (info) => info.getValue(),
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }: { row: any }) => {
       const product = row.original;
       return (

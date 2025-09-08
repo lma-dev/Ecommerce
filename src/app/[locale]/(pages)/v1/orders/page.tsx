@@ -31,7 +31,7 @@ const OrdersPage = () => {
   return (
     <div>
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">Order Lists</h1>
+        <h1 className="text-2xl font-semibold">{t("orderList")}</h1>
         <OrderTable showDialog={showDialog} t={t} />
       </div>
       {dialog.type && (
@@ -48,4 +48,3 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
-

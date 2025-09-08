@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import BreadCrumb from "@/app/[locale]/_components/ui/bread-crumb";
 import CategoryForm from "../../_components/CategoryForm";
 import { useCategoryQuery } from "@/features/categories/api";
@@ -8,9 +9,10 @@ import { useCategoryQuery } from "@/features/categories/api";
 export default function CategoryEditPage() {
   const { id } = useParams();
   const { data: category, isLoading } = useCategoryQuery(Number(id));
+  const t = useTranslations("Translation");
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!category) return <div>Category not found</div>;
+  if (isLoading) return <div>{t("loadingCategories")}</div>;
+  if (!category) return <div>{t("categoryNotFound", { default: "Category not found" })}</div>;
 
   return (
     <div>

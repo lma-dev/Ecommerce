@@ -7,31 +7,32 @@ import { ColumnDef } from "@tanstack/react-table";
 type DialogType = "delete" | "export" | null;
 
 export const createUserColumns = (
-  showDialog: (type: DialogType, method: () => void) => void
+  showDialog: (type: DialogType, method: () => void) => void,
+  t: any
 ): ColumnDef<User>[] => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => t("name"),
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: () => t("email"),
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: () => t("role"),
   },
   {
     accessorKey: "accountStatus",
-    header: "Status",
+    header: () => t("status"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: () => t("createdAt"),
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }: { row: any }) => {
       const user = row.original;
       return <UserActionDropdown user={user} showDialog={showDialog} />;

@@ -65,7 +65,7 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
     accountStatus: undefined, // keep unfiltered on backend
   });
 
-  const userColumns = createUserColumns(showDialog);
+  const userColumns = createUserColumns(showDialog, t);
 
   // client-side role + status filtering
   const filteredRows = useMemo(() => {
@@ -91,7 +91,7 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by name or email"
+            placeholder={t("searchByNameOrEmail")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             onBlur={() => setCommittedSearch(searchFilter)}
@@ -105,11 +105,11 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
             onValueChange={(val) => setRoleFilter(val as RoleSelectValue)}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Role" />
+              <SelectValue placeholder={t("filterByRole")} />
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="clear">All Roles</SelectItem>
+              <SelectItem value="clear">{t("allRoles")}</SelectItem>
               {userRoleOptions.map((role) => (
                 <SelectItem key={role} value={role}>
                   {userRoleLabel[role]}

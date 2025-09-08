@@ -53,7 +53,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
     generalSearch: committedSearch || undefined,
   });
 
-  const columns = createCustomerColumns(showDialog);
+  const columns = createCustomerColumns(showDialog, t);
 
   const rows = useMemo(() => data?.data ?? [], [data?.data]);
   const filteredRows = useMemo(() => {
@@ -74,7 +74,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by name or email"
+            placeholder={t("searchByNameOrEmail")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             onBlur={() => setCommittedSearch(searchFilter)}
@@ -106,7 +106,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
           href={`/${locale}/v1/customers/create`}
           className="inline-flex items-center"
         >
-          <Button>Create Customer</Button>
+          <Button>{t("createCustomer")}</Button>
         </Link>
       </div>
 

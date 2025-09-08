@@ -8,26 +8,27 @@ import { ColumnDef } from "@tanstack/react-table";
 type DialogType = "delete" | null;
 
 export const createCategoryColumns = (
-  showDialog: (type: DialogType, method: () => void) => void
+  showDialog: (type: DialogType, method: () => void) => void,
+  t: any
 ): ColumnDef<Category>[] => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => t("name"),
   },
   {
     accessorKey: "isActive",
-    header: "Status",
+    header: () => t("status"),
     cell: ({ row }) => (
       <ActiveBadge value={row.getValue("isActive") as string | null} />
     ),
   },
   {
     accessorKey: "description",
-    header: "Description",
+    header: () => t("description"),
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }: { row: any }) => {
       const category = row.original;
       return (

@@ -7,19 +7,20 @@ import { CustomerActionsDropdown } from "@/v1/customers/_components/CustomerActi
 type DialogType = "delete" | null;
 
 export const createCustomerColumns = (
-  showDialog: (type: DialogType, method: () => void) => void
+  showDialog: (type: DialogType, method: () => void) => void,
+  t: any
 ): ColumnDef<Customer>[] => [
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "email", header: "Email" },
+  { accessorKey: "name", header: () => t("name") },
+  { accessorKey: "email", header: () => t("email") },
   {
     accessorKey: "accountStatus",
-    header: "Status",
+    header: () => t("status"),
   },
-  { accessorKey: "phone", header: "Phone" },
-  { accessorKey: "createdAt", header: "Created" },
+  { accessorKey: "phone", header: () => t("phone") },
+  { accessorKey: "createdAt", header: () => t("created") },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }: { row: any }) => {
       const customer = row.original as Customer;
       return (

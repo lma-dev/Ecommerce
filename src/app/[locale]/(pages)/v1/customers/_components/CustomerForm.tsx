@@ -10,7 +10,7 @@ import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
 import { Input } from "@/components/ui/input";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 type FormValues = z.infer<typeof updateCustomerSchema>;
 
@@ -40,6 +40,7 @@ const CustomerForm = ({
   });
 
   const locale = useLocale();
+  const t = useTranslations("Translation");
   const create = useCreateCustomer();
   const update = useUpdateCustomer();
 
@@ -47,28 +48,27 @@ const CustomerForm = ({
     if (mode === "edit" && defaultValues?.id) {
       update.mutate(
         { id: defaultValues.id, ...values },
-        { onSuccess: () => ToastAlert.success({ message: "Customer updated successfully" }) },
+        { onSuccess: () => ToastAlert.success({ message: t("updateSuccess") }) },
       );
     } else {
       create.mutate(values as any, {
-        onSuccess: () => ToastAlert.success({ message: "Customer created successfully" }),
+        onSuccess: () => ToastAlert.success({ message: t("createSuccess") }),
       });
     }
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input {...form.register("name")} placeholder="Name" />
-      <Input {...form.register("email")} placeholder="Email" type="email" />
-      <Input {...form.register("phone")} placeholder="Phone" />
+      <Input {...form.register("name")} placeholder={t("name")} />
+      <Input {...form.register("email")} placeholder={t("email")} type="email" />
+      <Input {...form.register("phone")} placeholder={t("phone")} />
 
       <div className="flex justify-between items-center">
-        <CustomLink href={`/${locale}/v1/customers`}>Back</CustomLink>
-        <FormSubmitButton text={mode === "edit" ? "Update Customer" : "Create Customer"} />
+        <CustomLink href={`/${locale}/v1/customers`}>{t("back")}</CustomLink>
+        <FormSubmitButton text={mode === "edit" ? t("updateCustomer") : t("createCustomer")} />
       </div>
     </form>
   );
 };
 
 export default CustomerForm;
-

@@ -57,7 +57,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
     isActive: undefined, // keep unfiltered on backend
   });
 
-  const productColumns = createProductColumns(showDialog);
+  const productColumns = createProductColumns(showDialog, t);
 
   const filteredRows = useMemo(() => {
     const rows = data?.data ?? [];
@@ -78,7 +78,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4">
           <Input
-            placeholder="Search by name"
+            placeholder={t("searchByName")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             onBlur={() => setCommittedSearch(searchFilter)} // refetch only when committed

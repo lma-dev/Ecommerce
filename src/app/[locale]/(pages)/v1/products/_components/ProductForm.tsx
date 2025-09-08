@@ -16,7 +16,7 @@ import { z } from "zod";
 import { createProductSchema } from "@/features/products/schemas/createProductSchema";
 import { updateProductSchema } from "@/features/products/schemas/updateProductSchema";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
 import {
@@ -75,6 +75,7 @@ const ProductForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const locale = useLocale();
+  const t = useTranslations("Translation");
 
   const create = useCreateProduct();
   const update = useUpdateProduct();
@@ -88,33 +89,33 @@ const ProductForm = ({
         { id: defaultValues.id, ...values },
         {
           onSuccess: () =>
-            ToastAlert.success({ message: "Product updated successfully" }),
+            ToastAlert.success({ message: t("updateSuccess") }),
         }
       );
     } else {
       create.mutate(values, {
         onSuccess: () =>
-          ToastAlert.success({ message: "Product created successfully" }),
+          ToastAlert.success({ message: t("createSuccess") }),
       });
     }
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input {...form.register("name")} placeholder="Name" />
+      <Input {...form.register("name")} placeholder={t("name")} />
       <Input
         {...form.register("price", { valueAsNumber: true })}
-        placeholder="Price"
+        placeholder={t("price")}
         type="number"
       />
-      <Textarea {...form.register("description")} placeholder="Description" />
+      <Textarea {...form.register("description")} placeholder={t("description")} />
 
       {/* Category Select (shows name, submits id) */}
       <Controller
         name="categoryId"
         control={form.control}
         render={({ field }) => {
-          if (isLoadingCategories) return <div>Loading categories...</div>;
+          if (isLoadingCategories) return <div>{t("loadingCategories")}</div>;
 
           const categories = categoriesRes?.data ?? [];
           const selectedId = field.value as number | null | undefined;
@@ -134,7 +135,7 @@ const ProductForm = ({
               onValueChange={(v) => field.onChange(Number(v))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select Category" />
+                <SelectValue placeholder={t("selectCategory")} />
               </SelectTrigger>
               <SelectContent>
                 {fallbackOption && (
@@ -181,12 +182,12 @@ const ProductForm = ({
             onValueChange={(v) => field.onChange(v as ProductStatusType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select Release state" />
+              <SelectValue placeholder={t("selectStatus")} />
             </SelectTrigger>
             <SelectContent>
               {productStatusOptions.map((st) => (
                 <SelectItem key={st} value={st}>
-                  {st === "ACTIVE" ? "ACTIVE" : "INACTIVE"}
+                  {st === "ACTIVE" ? t("active") : t("inactive")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -197,10 +198,10 @@ const ProductForm = ({
         <CustomLink
           href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/products`}
         >
-          Back
+          {t("back")}
         </CustomLink>
         <FormSubmitButton
-          text={mode === "edit" ? "Update Product" : "Create Product"}
+          text={mode === "edit" ? t("updateProduct") : t("createProduct")}
         />
       </div>
     </form>

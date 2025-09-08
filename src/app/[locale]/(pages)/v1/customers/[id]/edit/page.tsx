@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import BreadCrumb from "@/app/[locale]/_components/ui/bread-crumb";
 import CustomerForm from "../../_components/CustomerForm";
 import { useCustomerQuery } from "@/features/customers/api";
@@ -8,9 +9,10 @@ import { useCustomerQuery } from "@/features/customers/api";
 export default function CustomerEditPage() {
   const { id } = useParams();
   const { data: customer, isLoading } = useCustomerQuery(Number(id));
+  const t = useTranslations("Translation");
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!customer) return <div>Customer not found</div>;
+  if (isLoading) return <div>{t("loadingCustomers")}</div>;
+  if (!customer) return <div>{t("customerNotFound", { default: "Customer not found" })}</div>;
 
   return (
     <div>
@@ -22,4 +24,3 @@ export default function CustomerEditPage() {
     </div>
   );
 }
-
