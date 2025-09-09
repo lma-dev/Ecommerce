@@ -22,10 +22,10 @@ export const orderSchema = z.object({
   id: z.number(),
   // Some single-order responses may omit customer
   customer: orderCustomerSchema.optional().nullable(),
-  status: z.enum(orderStatusOptions as [string, ...string[]]),
+  status: z.enum(orderStatusOptions),
   notes: z.string().nullable().optional(),
   totalAmount: z.number(),
-  shippingAddress: z.string(),
+  shippingAddress: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   products: z.array(orderProductSchema),

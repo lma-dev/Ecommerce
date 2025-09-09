@@ -24,7 +24,10 @@ export function middleware(request: NextRequest) {
     const isSuperOnly = pathname.startsWith(`/${currentLocale}/v1/super`)
 
     if (isProtected && !token) {
-        return NextResponse.redirect(new URL(`/${currentLocale}/login`, request.url))
+        // Console area uses admin login; append type=console for clarity
+        const url = new URL(`/${currentLocale}/login`, request.url)
+        url.searchParams.set('type', 'console')
+        return NextResponse.redirect(url)
     }
 
     if (isAdminOnly && !['ADMIN', 'SUPER_ADMIN'].includes(role ?? '')) {
@@ -43,4 +46,3 @@ export const config = {
         '/((?!api|_next|.*\\..*).*)', // All pages except API/static
     ],
 }
-
