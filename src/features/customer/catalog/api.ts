@@ -9,6 +9,8 @@ export const useCustomerCategories = () =>
       return (res as any).data ?? res
     },
     staleTime: 60_000,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: true,
   })
 
 export const useCustomerProducts = (filters?: { categoryId?: number; search?: string }) =>
@@ -25,4 +27,6 @@ export const useCustomerProducts = (filters?: { categoryId?: number; search?: st
     },
     staleTime: 30_000,
     enabled: Boolean(filters?.categoryId),
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: true,
   })

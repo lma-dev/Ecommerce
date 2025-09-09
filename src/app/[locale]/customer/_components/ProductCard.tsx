@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useCart } from "@/features/customer/cart/hooks";
+import { resolveAssetUrl } from "@/libs/assets";
 
 type Props = {
   product: any;
@@ -11,12 +12,18 @@ type Props = {
 export default function ProductCard({ product }: Props) {
   const t = useTranslations("Translation");
   const { add } = useCart();
-  const imageUrl = product?.image?.url || "https://via.placeholder.com/800x800.png?text=Product";
+  const raw = product?.image?.url || product?.imageUrl
+  const imageUrl = resolveAssetUrl(raw) || "https://via.placeholder.com/800x800.png?text=Product";
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white overflow-hidden transition shadow-sm hover:shadow-md">
-      <div className="w-full h-36 sm:h-40 bg-muted/40">
+      <div className="w-full h-36 sm:h-40 bg-white flex items-center justify-center p-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt={product.name} className="w-full h-full object-cover" />
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="w-full h-full object-contain"
+          loading="lazy"
+        />
       </div>
       <div className="p-4">
         <div className="font-semibold text-neutral-900 truncate" title={product.name}>{product.name}</div>

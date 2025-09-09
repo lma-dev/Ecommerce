@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/features/customer/cart/hooks";
 import { useTranslations } from "next-intl";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { resolveAssetUrl } from "@/libs/assets";
 import { useState } from "react";
 import { createCustomerOrder } from "@/features/customer/orders/api";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
                 <div key={item.id} className="flex gap-3 items-center border border-neutral-200 rounded-xl p-3 bg-neutral-50">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={item.imageUrl || "https://via.placeholder.com/160x160.png?text=Product"}
+                    src={resolveAssetUrl(item.imageUrl) || "https://via.placeholder.com/160x160.png?text=Product"}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-md bg-muted"
                   />
