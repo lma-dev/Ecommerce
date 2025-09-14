@@ -1,12 +1,7 @@
-"use client";
-import React from "react";
-import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
+import { redirect } from 'next/navigation';
+import { defaultLocale } from '@/i18n/routing';
 
-export default function Home() {
-  return (
-    <section className="flex justify-center items-center min-h-screen">
-      <div>aa</div>
-    </section>
-  );
+export default function RootRedirect() {
+  redirect(`/${defaultLocale}`);
 }
+

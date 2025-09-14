@@ -8,6 +8,14 @@ import { loginSchema, LoginInput } from "@/auth/features/schemas/loginSchema";
 import { useCustomerLogin } from "@/features/customer-auth/hooks";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function CustomerLoginForm() {
   const t = useTranslations("Translation");
@@ -21,20 +29,52 @@ export default function CustomerLoginForm() {
   const onSubmit = (data: LoginInput) => mutate(data);
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input type="email" placeholder={t("email")} {...form.register("email")} />
-      <Input type="password" placeholder={t("password")} {...form.register("password")} />
-      {error && (
-        <p className="text-sm text-red-500">{t("loginFailed")}</p>
-      )}
-      <div className="flex items-center justify-between gap-2">
-        <Link href={`/${locale}/login?type=console`} className="text-blue-600 hover:underline text-sm">
-          {t("goToAdminLogin")}
-        </Link>
-        <Button type="submit" disabled={isPending} className="w-32">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("email")}</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="name@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("password")}</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="********" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {error && (
+          <p className="text-sm text-red-500">{t("loginFailed")}</p>
+        )}
+        <div className="flex items-center justify-between text-sm">
+          <Link href={`/${locale}/forgot-password`} className="text-blue-600 hover:underline">
+            {t("forgotPassword")}
+          </Link>
+          <div className="text-muted-foreground">
+            {t("noAccount")} {" "}
+            <Link href={`/${locale}/register`} className="text-blue-600 hover:underline">
+              {t("register")}
+            </Link>
+          </div>
+        </div>
+        <Button type="submit" disabled={isPending} className="w-full">
           {isPending ? t("loggingIn") : t("signIn")}
         </Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }

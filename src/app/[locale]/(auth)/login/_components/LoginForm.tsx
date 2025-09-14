@@ -41,7 +41,7 @@ export default function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <FormField
           control={form.control}
           name="email"
@@ -71,6 +71,12 @@ export default function LoginForm() {
         {error && (
           <p className="text-sm text-red-500">{t("loginFailed")}</p>
         )}
+        <div className="flex items-center justify-between text-sm">
+          <div />
+          <a href={`/${locale}/forgot-password?type=console`} className="text-blue-600 hover:underline">
+            {t("forgotPassword")}
+          </a>
+        </div>
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending ? t("loggingIn") : t("login")}
         </Button>

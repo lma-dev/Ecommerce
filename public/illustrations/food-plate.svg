@@ -1,0 +1,36 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- soft shadow -->
+  <ellipse cx="256" cy="420" rx="160" ry="22" fill="url(#shadow)"/>
+
+  <!-- plate -->
+  <circle cx="256" cy="256" r="160" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="8"/>
+  <circle cx="256" cy="256" r="120" fill="#FAFAFA" stroke="#F3F4F6" stroke-width="4"/>
+
+  <!-- soup base -->
+  <circle cx="256" cy="256" r="100" fill="#FED7AA"/>
+
+  <!-- garnish leaves -->
+  <path d="M230 240c-18 0-30 14-32 22 8 2 22 0 30-6 8-6 10-12 2-16z" fill="#34D399"/>
+  <path d="M304 275c18 0 30 14 32 22-8 2-22 0-30-6-8-6-10-12-2-16z" fill="#34D399"/>
+  <path d="M274 230c10-14 34-18 42-10-2 8-14 18-26 22-12 4-20 0-16-12z" fill="#10B981"/>
+
+  <!-- noodles -->
+  <path d="M176 256c30-24 72-24 112-8 40 16 72 24 96 8" stroke="#F59E0B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M176 280c40-22 88-20 128-6 40 14 64 20 88 6" stroke="#FDBA74" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- chopsticks -->
+  <rect x="312" y="116" width="10" height="150" rx="3" transform="rotate(20 312 116)" fill="#A16207"/>
+  <rect x="328" y="112" width="10" height="160" rx="3" transform="rotate(20 328 112)" fill="#CA8A04"/>
+
+  <!-- small herbs -->
+  <circle cx="216" cy="292" r="6" fill="#059669"/>
+  <circle cx="292" cy="236" r="5" fill="#059669"/>
+  <circle cx="320" cy="300" r="5" fill="#059669"/>
+</svg>
+

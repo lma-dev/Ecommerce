@@ -16,7 +16,9 @@ const locales = [
   { code: "jp", label: "日本語" },
 ];
 
-export function LanguageSwitcher() {
+import { Globe } from "lucide-react";
+
+export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -32,8 +34,13 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="capitalize">
-          {current?.label ?? locale}
+        <Button
+          variant="ghost"
+          size={compact ? "icon" : "sm"}
+          className={compact ? undefined : "capitalize"}
+          aria-label="Change language"
+        >
+          {compact ? <Globe className="h-4 w-4" /> : current?.label ?? locale}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
