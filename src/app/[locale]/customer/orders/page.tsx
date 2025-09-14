@@ -15,7 +15,7 @@ export default function CustomerOrdersPage() {
 
       <section className="max-w-4xl mx-auto w-full">
         <h1 className="text-2xl font-bold mb-4">{t("orders")}</h1>
-        <div className="rounded-2xl border bg-white divide-y">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 divide-y divide-amber-100">
           {isLoading && (
             <div className="p-4 text-sm text-neutral-500">{t("loadingOrders", { default: "Loading orders..." })}</div>
           )}
@@ -26,7 +26,7 @@ export default function CustomerOrdersPage() {
             <Link
               key={o.id}
               href={{ pathname: "/customer/orders/" + o.id }}
-              className="block p-4"
+              className="block p-4 hover:bg-amber-100/60 transition rounded-xl"
             >
               <div className="flex items-center justify-between">
                 <div className="font-medium text-neutral-900">#{o.id}</div>

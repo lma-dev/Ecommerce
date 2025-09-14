@@ -113,6 +113,7 @@ export const useCreateReport = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reports'] })
+            ToastAlert.success({ message: 'Report deleted successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create report" })

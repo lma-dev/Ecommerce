@@ -26,6 +26,7 @@ import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
 import CustomLink from "@/app/[locale]/_components/ui/custom-link";
 import { useLocale, useTranslations } from "next-intl";
 import React from "react";
+import { cn } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
 
 type FormValues = z.infer<typeof updateOrderSchema>;
@@ -37,13 +38,26 @@ const OrderForm = ({
   mode: "create" | "edit";
   defaultValues?: any;
 }) => {
+  // Build initial product counts from default values (supports duplicates or quantity fields)
+  const initialCounts = React.useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const p of defaultValues?.products ?? []) {
+      const qty = (p?.quantity ?? p?.qty ?? p?.pivot?.quantity ?? 1) as number;
+      const prev = counts.get(p.id) ?? 0;
+      counts.set(p.id, prev + qty);
+    }
+    return counts;
+  }, [defaultValues?.products]);
+
   const mappedDefaults: FormValues = defaultValues
     ? {
         customerId: defaultValues.customer?.id,
         status: defaultValues.status,
         notes: defaultValues.notes ?? null,
         shippingAddress: defaultValues.shippingAddress,
-        productIds: (defaultValues.products ?? []).map((p: any) => p.id),
+        // Keep productIds for validation; will be updated from counts before submit
+        productIds:
+          defaultValues.products?.map((p: any) => p.id) ?? [],
       }
     : {
         customerId: undefined,
@@ -74,17 +88,43 @@ const OrderForm = ({
     { name: productSearch || undefined }
   );
 
+  // Local state for quantities per product
+  const [productCounts, setProductCounts] = React.useState<Map<number, number>>(
+    initialCounts
+  );
+
+  // Sync initial counts to form productIds on mount
+  React.useEffect(() => {
+    if (productCounts.size > 0) {
+      const ids: number[] = [];
+      productCounts.forEach((q, id) => { for (let i=0;i<q;i++) ids.push(id) });
+      form.setValue("productIds", ids);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Helper to recompute productIds (with repetition) from counts
+  const computeProductIdsFromCounts = React.useCallback(() => {
+    const ids: number[] = [];
+    productCounts.forEach((qty, id) => {
+      for (let i = 0; i < qty; i++) ids.push(id);
+    });
+    return ids;
+  }, [productCounts]);
+
   const onSubmit = (values: FormValues) => {
+    const productIds = computeProductIdsFromCounts();
+    const payload = { ...values, productIds } as FormValues;
     if (mode === "edit" && defaultValues?.id) {
       update.mutate(
-        { id: defaultValues.id, ...values },
+        { id: defaultValues.id, ...payload },
         {
           onSuccess: () =>
             ToastAlert.success({ message: "Order updated successfully" }),
         }
       );
     } else {
-      create.mutate(values, {
+      create.mutate(payload, {
         onSuccess: () =>
           ToastAlert.success({ message: "Order created successfully" }),
       });
@@ -106,6 +146,20 @@ const OrderForm = ({
               <SelectValue placeholder={t("selectCustomer")} />
             </SelectTrigger>
             <SelectContent>
+              {/* Ensure current customer (from defaultValues) is selectable even if not in the first page */}
+              {(() => {
+                const currentId = field.value as number | undefined;
+                const inList = (customersRes?.data ?? []).some((c: any) => c.id === currentId);
+                if (currentId && !inList && defaultValues?.customer) {
+                  const c = defaultValues.customer;
+                  return (
+                    <SelectItem key={`current-${c.id}`} value={String(c.id)}>
+                      {c.name} ({c.email})
+                    </SelectItem>
+                  );
+                }
+                return null;
+              })()}
               {(customersRes?.data ?? []).map((c: any) => (
                 <SelectItem key={c.id} value={String(c.id)}>
                   {c.name} ({c.email})
@@ -148,7 +202,7 @@ const OrderForm = ({
       {/* Notes */}
       <Textarea {...form.register("notes")} placeholder={t("notesOptional")} />
 
-      {/* Products - searchable, paginated list for large datasets */}
+      {/* Products - searchable, paginated list with quantity controls */}
       <div className="space-y-2">
         <div className="font-medium">{t("products")}</div>
         <div className="flex gap-2 items-center">
@@ -162,7 +216,7 @@ const OrderForm = ({
             onBlur={() => setProductPage(1)}
           />
           <div className="text-sm text-muted-foreground">
-            Selected: {(form.watch("productIds") ?? []).length}
+            Selected: {Array.from(productCounts.values()).reduce((a, b) => a + b, 0)}
           </div>
         </div>
 
@@ -171,25 +225,52 @@ const OrderForm = ({
             <div className="p-2 text-sm">{t("loadingProducts")}</div>
           ) : (
             (productsRes?.data ?? []).map((p: any) => {
-              const checked = (form.watch("productIds") ?? []).includes(p.id);
+              const qty = productCounts.get(p.id) ?? 0;
+              const setQty = (next: number) => {
+                const normalized = Math.max(0, Math.floor(next || 0));
+                setProductCounts((prev) => {
+                  const map = new Map(prev);
+                  if (normalized <= 0) map.delete(p.id);
+                  else map.set(p.id, normalized);
+                  // keep form productIds in sync for validation
+                  form.setValue("productIds", (() => {
+                    const ids: number[] = [];
+                    map.forEach((q, id) => { for (let i=0;i<q;i++) ids.push(id) })
+                    return ids;
+                  })());
+                  return map;
+                });
+              };
+              const active = qty > 0;
               return (
-                <label key={p.id} className="flex items-center gap-2 py-1">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => {
-                      const current = new Set(
-                        form.getValues("productIds") ?? []
-                      );
-                      if (e.target.checked) current.add(p.id);
-                      else current.delete(p.id);
-                      form.setValue("productIds", Array.from(current));
-                    }}
-                  />
-                  <span className="truncate">
-                    {p.name} - ${p.price}
-                  </span>
-                </label>
+                <div
+                  key={p.id}
+                  className={cn(
+                    "flex items-center justify-between gap-2 py-2 px-2 rounded-md transition-colors",
+                    active && "bg-amber-50 border border-amber-200"
+                  )}
+                  aria-selected={active}
+                >
+                  <div className="truncate flex items-center gap-2">
+                    <span className="truncate">{p.name} - ${p.price}</span>
+                    {active && (
+                      <span className="ml-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                        x{qty}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button type="button" variant="outline" size="sm" onClick={() => setQty(qty - 1)}>-</Button>
+                    <Input
+                      value={qty}
+                      onChange={(e) => setQty(Number(e.target.value))}
+                      className="w-16 text-center"
+                      type="number"
+                      min={0}
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => setQty(qty + 1)}>+</Button>
+                  </div>
+                </div>
               );
             })
           )}

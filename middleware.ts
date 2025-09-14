@@ -23,18 +23,46 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/${defaultLocale}${pathname}${search}`, request.url))
     }
 
-    // 2) Role-based protection (only after we know locale)
+    // 2) Auth protection (after we know locale)
     const currentLocale = hasKnownLocale ? (maybeLocale as string) : defaultLocale
-    const token = request.cookies.get('auth_token')?.value
+
+    const adminToken = request.cookies.get('auth_token')?.value
+        || request.cookies.get('next-auth.session-token')?.value
+        || request.cookies.get('__Secure-next-auth.session-token')?.value
+    const customerToken = request.cookies.get('customer_token')?.value
+    const anyToken = adminToken || customerToken
     const role = request.cookies.get('auth_role')?.value
 
-    const isProtected = pathname.startsWith(`/${currentLocale}/v1`)
+    const isAdminArea = pathname.startsWith(`/${currentLocale}/v1`)
+    const isCustomerArea = pathname.startsWith(`/${currentLocale}/customer`)
     const isAdminOnly = pathname.startsWith(`/${currentLocale}/v1/admin`)
     const isSuperOnly = pathname.startsWith(`/${currentLocale}/v1/super`)
+    const isPublic = pathname === `/${currentLocale}` || pathname === `/${currentLocale}/login`
 
-    if (isProtected && !token) {
+    // Public pages: landing and login
+    if (isPublic) {
+        return intlMiddleware(request)
+    }
+
+    // Admin area requires admin token
+    if (isAdminArea && !adminToken) {
         const url = new URL(`/${currentLocale}/login`, request.url)
         url.searchParams.set('type', 'console')
+        url.searchParams.set('reason', 'auth')
+        return NextResponse.redirect(url)
+    }
+
+    // Customer area requires customer token
+    if (isCustomerArea && !customerToken) {
+        const url = new URL(`/${currentLocale}/login`, request.url)
+        url.searchParams.set('reason', 'auth')
+        return NextResponse.redirect(url)
+    }
+
+    // Other pages require any authenticated token
+    if (!anyToken) {
+        const url = new URL(`/${currentLocale}/login`, request.url)
+        url.searchParams.set('reason', 'auth')
         return NextResponse.redirect(url)
     }
 

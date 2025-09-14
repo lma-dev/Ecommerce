@@ -104,6 +104,7 @@ export const useCreateCategory = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] })
+            ToastAlert.success({ message: 'Category deleted successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create category" })

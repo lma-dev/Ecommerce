@@ -10,8 +10,8 @@ export default function LandingPage() {
   const locale = useLocale();
 
   return (
-    <main className="min-h-screen w-full bg-amber-50 flex items-center justify-center px-6">
-      <div className="relative w-full max-w-5xl rounded-3xl border bg-white shadow-sm p-8 md:p-12">
+    <main className="min-h-screen w-full bg-background flex items-center justify-center px-6">
+      <div className="relative w-full max-w-5xl rounded-3xl border border-border bg-card shadow-sm p-8 md:p-12">
         {/* Corner badge brand */}
         <div className="absolute -top-4 -left-4">
           <Badge className="rounded-full bg-amber-600 text-white shadow-md px-3 py-1">
@@ -31,7 +31,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8">
               <Link href={`/${locale}/login`}>
-                <Button size="lg" className="min-w-40 bg-amber-600 text-white hover:bg-amber-700">
+                <Button size="lg" className="min-w-40">
                   {t("getStarted")}
                 </Button>
               </Link>

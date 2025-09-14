@@ -16,20 +16,29 @@ export function TopNavbar() {
 
   return (
     <>
-      <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b bg-background z-50">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setOpen((prev) => !prev)}
-            className="md:hidden border p-2 rounded"
-            aria-label="Toggle Sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <span className="text-lg font-bold">{t("appTitle")}</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <LanguageSwitcher />
-          <UserProfileDropdown />
+      <header className="sticky top-0 z-50 border-b bg-background">
+        <div className="h-16 mx-auto w-full max-w-6xl flex items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <button
+              onClick={() => setOpen((prev) => !prev)}
+              className="md:hidden border p-2 rounded"
+              aria-label="Toggle Sidebar"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <span className="hidden md:inline text-lg font-bold truncate max-w-[40vw]">
+              {t("appTitle")}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="md:hidden">
+              <LanguageSwitcher compact />
+            </div>
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
+            <UserProfileDropdown />
+          </div>
         </div>
       </header>
 

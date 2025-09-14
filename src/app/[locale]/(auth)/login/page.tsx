@@ -2,6 +2,7 @@ import AdminLoginForm from "@/auth/_components/LoginForm";
 import CustomerLoginForm from "@/auth/_components/CustomerLoginForm";
 import { useTranslations } from "next-intl";
 import { use } from "react";
+import LoginNotice from "./_components/LoginNotice";
 
 export default function LoginPage({
   searchParams,
@@ -12,6 +13,7 @@ export default function LoginPage({
   const params = searchParams ? use(searchParams) : undefined;
   const type = (params?.type ?? "") as string;
   const isConsole = type === "console";
+  const reason = (params?.reason ?? "") as string;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center px-4">
@@ -26,6 +28,7 @@ export default function LoginPage({
             </p>
           </div>
           {isConsole ? <AdminLoginForm /> : <CustomerLoginForm />}
+          <LoginNotice reason={reason} />
         </div>
       </div>
     </div>

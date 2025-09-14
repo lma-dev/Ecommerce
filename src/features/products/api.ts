@@ -113,6 +113,7 @@ export const useCreateProduct = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] })
+            ToastAlert.success({ message: 'Product deleted successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create product" })

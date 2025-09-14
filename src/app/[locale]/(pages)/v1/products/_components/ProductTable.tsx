@@ -42,6 +42,7 @@ interface ProductTableProps {
 
 const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
   const [page, setPage] = useState(1);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // 👇 status is local-only; no refetch
   const [statusFilter, setStatusFilter] = useState<StatusSelectValue>("clear");
@@ -71,12 +72,30 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <div>{t("loadingProducts")}</div>;
+  const renderSkeleton = () => (
+    <div className="rounded-md border overflow-hidden">
+      <div className="divide-y">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="p-4 animate-pulse">
+            <div className="h-4 bg-muted rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+        <div className="flex items-center justify-between md:hidden">
+          <button className="rounded-md border px-3 py-2 text-sm" onClick={() => setMobileFiltersOpen(v => !v)}>
+            {t("filterOptions")}
+          </button>
+          <Link href={`/${locale}/v1/products/create`} className="inline-flex items-center">
+            <Button>{t("createProduct")}</Button>
+          </Link>
+        </div>
+        <div className={`${mobileFiltersOpen ? '' : 'hidden md:flex'} grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-4 w-full min-w-0`}>
           <Input
             placeholder={t("searchByName")}
             value={searchFilter}
@@ -85,13 +104,14 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
             onKeyDown={(e) => {
               if (e.key === "Enter") setCommittedSearch(searchFilter);
             }}
+            className="w-full md:w-auto"
           />
 
           <Select
             value={statusFilter}
             onValueChange={(val) => setStatusFilter(val as StatusSelectValue)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder={t("filterByStatus")} />
             </SelectTrigger>
 
@@ -107,13 +127,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
           </Select>
         </div>
 
-        <Link
-          href={`/${locale}/v1/products/create`}
-          className="inline-flex items-center"
-        >
+        <Link href={`/${locale}/v1/products/create`} className="hidden md:inline-flex items-center md:self-auto self-end">
           <Button>{t("createProduct")}</Button>
         </Link>
       </div>
+
+      {!isLoading && filteredRows.length === 0 && (
+        <div className="rounded-md border p-6 text-center text-sm text-muted-foreground">
+          {t("noData")}
+        </div>
+      )}
 
       <div className="rounded-md border overflow-x-auto">
         <Table>
@@ -133,8 +156,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ showDialog, t }) => {
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={table.getAllColumns().length}>{renderSkeleton()}</TableCell>
+              </TableRow>
+            )}
+            {!isLoading && table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="hover:bg-accent/40 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

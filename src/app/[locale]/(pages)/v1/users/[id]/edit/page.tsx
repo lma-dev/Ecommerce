@@ -7,10 +7,12 @@ import UserForm from "@/v1/users/_components/UserForm";
 import BreadCrumb from "@/app/[locale]/_components/ui/bread-crumb";
 
 export default function UserEditPage() {
-  const { id } = useParams();
-  const { data: user, isLoading } = useUserQuery(Number(id));
+  const params = useParams<{ id?: string }>();
+  const numericId = params?.id ? Number(params.id) : NaN;
+  const { data: user, isLoading } = useUserQuery(numericId);
   const t = useTranslations("Translation");
 
+  if (!Number.isFinite(numericId)) return <div>{t("userNotFound", { default: "User not found" })}</div>;
   if (isLoading) return <div>{t("loadingUsers")}</div>;
   if (!user) return <div>{t("userNotFound", { default: "User not found" })}</div>;
 

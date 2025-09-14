@@ -43,6 +43,7 @@ interface CustomerTableProps {
 const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
   const [page, setPage] = useState(1);
   const [searchFilter, setSearchFilter] = useState("");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [committedSearch, setCommittedSearch] = useState("");
   type StatusSelectValue = UserAccountStatusType | "clear";
   const [statusFilter, setStatusFilter] = useState<StatusSelectValue>("clear");
@@ -67,12 +68,30 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <div>{t("loadingCustomers", { default: "Loading customers..." })}</div>;
+  const renderSkeleton = () => (
+    <div className="rounded-md border overflow-hidden">
+      <div className="divide-y">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="p-4 animate-pulse">
+            <div className="h-4 bg-muted rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+        <div className="flex items-center justify-between md:hidden">
+          <button className="rounded-md border px-3 py-2 text-sm" onClick={() => setMobileFiltersOpen(v => !v)}>
+            {t("filterOptions")}
+          </button>
+          <Link href={`/${locale}/v1/customers/create`} className="inline-flex items-center">
+            <Button>{t("createCustomer")}</Button>
+          </Link>
+        </div>
+        <div className={`${mobileFiltersOpen ? '' : 'hidden md:flex'} grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-4 w-full min-w-0`}>
           <Input
             placeholder={t("searchByNameOrEmail")}
             value={searchFilter}
@@ -81,13 +100,14 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
             onKeyDown={(e) => {
               if (e.key === "Enter") setCommittedSearch(searchFilter);
             }}
+            className="w-full md:w-auto"
           />
 
           <Select
             value={statusFilter}
             onValueChange={(val) => setStatusFilter(val as StatusSelectValue)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder={t("filterByStatus") ?? "Filter by status"} />
             </SelectTrigger>
 
@@ -102,13 +122,16 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
           </Select>
         </div>
 
-        <Link
-          href={`/${locale}/v1/customers/create`}
-          className="inline-flex items-center"
-        >
+        <Link href={`/${locale}/v1/customers/create`} className="hidden md:inline-flex items-center md:self-auto self-end">
           <Button>{t("createCustomer")}</Button>
         </Link>
       </div>
+
+      {!isLoading && filteredRows.length === 0 && (
+        <div className="rounded-md border p-6 text-center text-sm text-muted-foreground">
+          {t("noData")}
+        </div>
+      )}
 
       <div className="rounded-md border overflow-x-auto">
         <Table>
@@ -128,8 +151,13 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ showDialog, t }) => {
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={table.getAllColumns().length}>{renderSkeleton()}</TableCell>
+              </TableRow>
+            )}
+            {!isLoading && table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="hover:bg-accent/40 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

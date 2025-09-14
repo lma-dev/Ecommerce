@@ -1,5 +1,6 @@
 import { Toaster } from "sonner";
 import "../styles/globals.css";
+import { SessionProviders } from "@/providers/session-provider";
 
 export default function RootLayout({
   children,
@@ -9,8 +10,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Toaster richColors position="top-right" closeButton />
-        {children}
+        <SessionProviders>
+          <Toaster richColors position="top-right" closeButton />
+          {children}
+        </SessionProviders>
       </body>
     </html>
   );

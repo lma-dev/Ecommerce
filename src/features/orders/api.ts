@@ -99,6 +99,7 @@ export const useCreateOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      ToastAlert.success({ message: 'Order deleted successfully' })
     },
     onError: () => {
       ToastAlert.error({ message: 'Failed to create order' })

@@ -39,6 +39,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
           size={compact ? "icon" : "sm"}
           className={compact ? undefined : "capitalize"}
           aria-label="Change language"
+          title={current?.label ?? locale}
         >
           {compact ? <Globe className="h-4 w-4" /> : current?.label ?? locale}
         </Button>

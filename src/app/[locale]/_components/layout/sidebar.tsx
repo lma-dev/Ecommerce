@@ -19,7 +19,6 @@ export function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
     { label: t("orders"), href: `/${locale}/${version}/orders` },
     { label: t("users"), href: `/${locale}/${version}/users` },
     { label: t("customers"), href: `/${locale}/${version}/customers` },
-    { label: t("settings"), href: `/${locale}/${version}/settings` },
   ];
 
   return (
@@ -30,10 +29,10 @@ export function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
           href={link.href}
           onClick={onLinkClick}
           className={cn(
-            "rounded-md px-3 py-2 hover:bg-muted transition-colors",
+            "rounded-md px-3 py-2 hover:bg-muted transition-colors border-l-2",
             pathname === link.href
-              ? "bg-muted font-semibold"
-              : "text-muted-foreground"
+              ? "bg-muted font-semibold border-primary"
+              : "text-muted-foreground border-transparent"
           )}
         >
           {link.label}

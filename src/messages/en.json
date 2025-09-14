@@ -127,6 +127,8 @@
     "price": "Price",
     "products": "Products",
     "profile": "Profile",
+    "updateUser": "Update User",
+    "selectRole": "Select Role",
     "reject": "Reject",
     "rejectedReports": "Rejected Reports",
     "reportDetail": "Report Detail",
@@ -148,6 +150,13 @@
     "selectType": "Select Type",
     "setting": "Setting",
     "settings": "Settings",
+    "general": "General",
+    "appearance": "Appearance",
+    "localization": "Localization",
+    "brandColor": "Brand Color",
+    "defaultLocale": "Default Locale",
+    "note": "These settings affect app labels and defaults.",
+    "noteLocales": "Changing default locale requires a redeploy of routing config.",
     "shippingAddress": "Shipping Address",
     "signOut": "Sign Out",
     "status": "Status",
@@ -171,6 +180,7 @@
     "verifier": "Verifier",
     "cart": "Cart",
     "emptyCart": "Your cart is empty",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "save": "Save"
   }
 }

@@ -119,6 +119,7 @@ export const useCreateUser = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] })
+            ToastAlert.success({ message: 'User deleted successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create user" })

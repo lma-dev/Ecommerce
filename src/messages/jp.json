@@ -127,6 +127,8 @@
     "price": "価格",
     "products": "商品",
     "profile": "プロフィール",
+    "updateUser": "ユーザーを更新",
+    "selectRole": "役割を選択",
     "reject": "拒否",
     "rejectedReports": "拒否されたレポート",
     "reportDetail": "レポート詳細",
