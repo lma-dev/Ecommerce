@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Customer extends Model implements CanResetPasswordContract
+class Customer extends Authenticatable implements CanResetPasswordContract
 {
     use HasApiTokens, Notifiable, HasFactory, SoftDeletes, CanResetPasswordTrait;
 

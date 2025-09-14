@@ -3,6 +3,7 @@
 namespace App\UseCases\Order;
 
 use App\Enums\OrderStatusType;
+use App\Events\OrderCreated;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
@@ -36,7 +37,16 @@ class StoreOrderAction
                 'total_amount'    => $subtotal,
             ]);
 
-            return $order->load('products');
+            $order = $order->load(['customer', 'products']);
+
+            // Broadcast immediately for real-time admin dashboards (only if broadcaster available)
+            $driver = config('broadcasting.default');
+            $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
+            if ($driver !== 'log' && $pusherReady) {
+                event(new OrderCreated($order));
+            }
+
+            return $order;
         });
     }
 }

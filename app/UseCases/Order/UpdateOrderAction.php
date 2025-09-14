@@ -3,6 +3,7 @@
 namespace App\UseCases\Order;
 
 use App\Enums\OrderStatusType;
+use App\Events\OrderUpdated;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,16 @@ class UpdateOrderAction
                 ],
             ]);
 
-            return $order->load('products');
+            $order = $order->load(['customer', 'products']);
+
+            // Broadcast update for realtime clients (only if broadcaster available)
+            $driver = config('broadcasting.default');
+            $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
+            if ($driver !== 'log' && $pusherReady) {
+                event(new OrderUpdated($order));
+            }
+
+            return $order;
         });
     }
 }

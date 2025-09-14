@@ -8,7 +8,7 @@ class DetailOrderAction
 {
     public function __invoke(Order $order)
     {
-        $order->load(['products.image']);
+        $order->load(['customer', 'products.image']);
         return $order;
     }
 }
