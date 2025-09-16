@@ -23,11 +23,17 @@ class OrderSeeder extends Seeder
             $count = fake()->numberBetween(1, 5);
             $productIds = Product::inRandomOrder()->limit($count)->pluck('id')->all();
 
-            // link via pivot
-            $order->products()->sync($productIds);
+            // Build sync with quantity = 1 for each
+            $sync = [];
+            foreach ($productIds as $pid) {
+                $sync[$pid] = ['quantity' => 1];
+            }
 
-            // subtotal = sum(prices), no tax/discount
-            $subtotal = (float) Product::whereIn('id', $productIds)->sum('price');
+            // link via pivot with quantity
+            $order->products()->sync($sync);
+
+            // subtotal = sum(price * qty)
+            $subtotal = (float) $order->subtotal();
 
             // persist into total_amount
             $order->update(['total_amount' => $subtotal]);

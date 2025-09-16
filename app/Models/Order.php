@@ -22,7 +22,9 @@ class Order extends Model
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'order_product');
+        return $this->belongsToMany(Product::class, 'order_product')
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 
     public function statusHistories(): HasMany
@@ -37,8 +39,10 @@ class Order extends Model
 
     public function subtotal(): float
     {
-        // Efficient: sums directly in SQL via the relation (no loading)
-        return (float) $this->products()->sum('price');
+        // Sum price multiplied by pivot quantity
+        return (float) $this->products()
+            ->selectRaw('COALESCE(SUM(price * order_product.quantity), 0) as subtotal')
+            ->value('subtotal');
     }
 
     // Optional accessor if you want $order->subtotal attribute:

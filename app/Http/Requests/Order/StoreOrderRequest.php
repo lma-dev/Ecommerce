@@ -25,7 +25,7 @@ class StoreOrderRequest extends FormRequest
             'customerId'  => 'required|integer|exists:customers,id',
             'status'       => 'required|string|max:50',
             'notes'        => 'nullable|string|max:1000',
-            'shippingAddress' => 'sometimes|string|max:2000',
+            'shippingAddress' => 'nullable|string|max:2000',
             'productIds'  => 'required|array|min:1',
             'productIds.*' => 'integer|exists:products,id',
         ];

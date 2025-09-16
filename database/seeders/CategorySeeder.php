@@ -13,6 +13,22 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        Category::factory()->count(8)->create();
+        $names = [
+            'Beverages',
+            'Snacks',
+            'Staples',
+            'Canned & Instant',
+            'Dairy & Eggs',
+            'Bakery',
+            'Household',
+            'Personal Care',
+        ];
+
+        foreach ($names as $name) {
+            Category::updateOrCreate(
+                ['name' => $name],
+                ['description' => fake()->sentence()]
+            );
+        }
     }
 }

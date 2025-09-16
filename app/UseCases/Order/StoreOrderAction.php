@@ -27,8 +27,13 @@ class StoreOrderAction
                 'total_amount'     => 0,
             ]);
 
-            $productIds = array_values(array_unique($productIds));
-            $order->products()->sync($productIds);
+            // Build product => ['quantity' => count] map from duplicates
+            $counts = array_count_values($productIds);
+            $sync = [];
+            foreach ($counts as $productId => $qty) {
+                $sync[$productId] = ['quantity' => (int) $qty];
+            }
+            $order->products()->sync($sync);
 
             $subtotal = $order->subtotal();
 
