@@ -38,11 +38,11 @@ const OrderForm = ({
   mode: "create" | "edit";
   defaultValues?: any;
 }) => {
-  // Build initial product counts from default values (supports duplicates or quantity fields)
+  // Build initial product counts from default values (uses backend quantity field)
   const initialCounts = React.useMemo(() => {
     const counts = new Map<number, number>();
     for (const p of defaultValues?.products ?? []) {
-      const qty = (p?.quantity ?? p?.qty ?? p?.pivot?.quantity ?? 1) as number;
+      const qty = Number(p?.quantity ?? 1);
       const prev = counts.get(p.id) ?? 0;
       counts.set(p.id, prev + qty);
     }

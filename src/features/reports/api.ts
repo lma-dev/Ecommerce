@@ -75,7 +75,9 @@ export const useReportsQuery = (
         queryKey: ['reports', page, filters, sort],
         queryFn: () => fetchReports(page, filters, sort),
         placeholderData: (prev) => prev,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -98,6 +100,9 @@ export const useReportQuery = (id: number) =>
         queryKey: ['report', id],
         queryFn: () => fetchReport(id),
         enabled: !!id,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -113,7 +118,7 @@ export const useCreateReport = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reports'] })
-            ToastAlert.success({ message: 'Report deleted successfully' })
+            ToastAlert.success({ message: 'Report created successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create report" })

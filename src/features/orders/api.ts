@@ -58,9 +58,8 @@ export const useOrdersQuery = (
     queryKey: ['orders', page, filters],
     queryFn: () => fetchOrders(page, filters),
     placeholderData: (prev) => prev,
-    // Auto refresh every 1 minute
-    refetchInterval: 60_000,
-    refetchIntervalInBackground: true,
+    // Realtime via Pusher; disable polling
+    refetchInterval: false,
     staleTime: 30_000,
   })
 
@@ -82,8 +81,8 @@ export const useOrderQuery = (id: number) =>
     queryKey: ['order', id],
     queryFn: () => fetchOrder(id),
     enabled: !!id,
-    refetchInterval: 60_000,
-    refetchIntervalInBackground: true,
+    // Realtime via Pusher; disable polling
+    refetchInterval: false,
     staleTime: 30_000,
   })
 
@@ -99,7 +98,7 @@ export const useCreateOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
-      ToastAlert.success({ message: 'Order deleted successfully' })
+      ToastAlert.success({ message: 'Order created successfully' })
     },
     onError: () => {
       ToastAlert.error({ message: 'Failed to create order' })

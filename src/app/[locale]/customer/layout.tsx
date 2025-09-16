@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import ClientCustomerAuthEnforcer from "./ClientCustomerAuthEnforcer";
 
 export default async function CustomerLayout({
   children,
@@ -15,5 +16,11 @@ export default async function CustomerLayout({
     redirect(`/${params.locale}/login`);
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {/* Client-side guard for customer area when cookie is cleared post-render */}
+      <ClientCustomerAuthEnforcer locale={params.locale} />
+      {children}
+    </>
+  );
 }

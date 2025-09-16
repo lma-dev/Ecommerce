@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import OrderTable from "@/v1/orders/_components/OrderTable";
 import { ConfirmDialog } from "@/app/[locale]/_components/ui/confirm-dialog";
+import { RealtimeOrdersListener } from "@/features/orders/useRealtimeOrders";
 
 type DialogType = "delete" | null;
 
@@ -33,6 +34,7 @@ const OrdersPage = () => {
       <div className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">{t("orderList")}</h1>
         <OrderTable showDialog={showDialog} t={t} />
+        <RealtimeOrdersListener />
       </div>
       {dialog.type && (
         <ConfirmDialog

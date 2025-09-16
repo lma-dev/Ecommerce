@@ -16,6 +16,9 @@ const orderProductSchema = z.object({
   description: z.string().nullable().optional(),
   price: z.number(),
   isActive: z.string(),
+  quantity: z.number(),
+  imageUrl: z.string().url().optional(),
+  image: z.object({ id: z.number().optional(), url: z.string().url() }).optional(),
 })
 
 export const orderSchema = z.object({

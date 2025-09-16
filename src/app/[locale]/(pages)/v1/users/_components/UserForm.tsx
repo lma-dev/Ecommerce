@@ -28,6 +28,8 @@ import {
 } from "@/features/users/constants/status";
 
 // --- Shared UserForm Component ---
+import React from "react";
+
 const UserForm = ({
   mode,
   defaultValues,
@@ -52,18 +54,31 @@ const UserForm = ({
 
   const create = useCreateUser();
   const update = useUpdateUser();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword2, setShowPassword2] = React.useState(false);
 
   const onSubmit = (values: any) => {
+    // Build payload that backend expects only
+    const payload: any = {
+      name: values.name,
+      email: values.email,
+      role: values.role,
+      accountStatus: values.accountStatus,
+      password: values.password,
+    };
+
+    // Do not include password_confirmation in payload; only for client validation
+
     if (mode === "edit" && defaultValues?.id) {
       update.mutate(
-        { id: defaultValues.id, ...values },
+        { id: defaultValues.id, ...payload },
         {
           onSuccess: () =>
             ToastAlert.success({ message: t("updateSuccess") }),
         }
       );
     } else {
-      create.mutate(values, {
+      create.mutate(payload, {
         onSuccess: () =>
           ToastAlert.success({ message: t("createSuccess") }),
       });
@@ -73,7 +88,7 @@ const UserForm = ({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <Input {...form.register("name")} placeholder={t("name")} />
-      <Input {...form.register("email")} placeholder={t("email")} />
+      <Input {...form.register("email")} placeholder={t("email")} type="email" />
 
       <Controller
         name="role"
@@ -120,12 +135,39 @@ const UserForm = ({
       />
 
       {mode === "create" && (
-        <div>
-          <Input
-            type="password"
-            {...form.register("password")}
-            placeholder={t("password")}
-          />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              {...form.register("password")}
+              placeholder={t("password")}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              className="absolute inset-y-0 right-2 my-auto text-xs text-neutral-600 hover:text-foreground"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+          <div className="relative">
+            <Input
+              type={showPassword2 ? "text" : "password"}
+              placeholder={t("confirmPassword", { default: "Confirm Password" })}
+              autoComplete="new-password"
+              {...form.register("password_confirmation", {
+                validate: (v) => v === (form.getValues() as any).password || t("confirmPassword", { default: "Confirm Password" }),
+              })}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword2((s) => !s)}
+              className="absolute inset-y-0 right-2 my-auto text-xs text-neutral-600 hover:text-foreground"
+            >
+              {showPassword2 ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
       )}
       <div className="flex justify-between items-center">

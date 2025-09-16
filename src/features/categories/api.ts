@@ -66,7 +66,9 @@ export const useCategoriesQuery = (
         queryKey: ['categories', page, filters],
         queryFn: () => fetchCategories(page, filters),
         placeholderData: (prev) => prev,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -89,6 +91,9 @@ export const useCategoryQuery = (id: number) =>
         queryKey: ['category', id],
         queryFn: () => fetchCategory(id),
         enabled: !!id,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -104,7 +109,7 @@ export const useCreateCategory = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] })
-            ToastAlert.success({ message: 'Category deleted successfully' })
+            ToastAlert.success({ message: 'Category created successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create category" })

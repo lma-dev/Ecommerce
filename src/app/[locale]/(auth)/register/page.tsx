@@ -18,11 +18,23 @@ import axios from "@/libs/axios";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
 import Link from "next/link";
 
-const schema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(6),
-});
+const schema = z
+  .object({
+    name: z.string().min(1, { message: "Name is required" }),
+    email: z.string().email(),
+    phone: z
+      .string()
+      .min(10, { message: "Phone must be at least 10 digits" })
+      .max(15, { message: "Phone must be at most 15 digits" }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    password_confirmation: z
+      .string()
+      .min(8, { message: "Confirm Password must be at least 8 characters" }),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    path: ["password_confirmation"],
+    message: "Passwords do not match",
+  });
 
 type InputType = z.infer<typeof schema>;
 
@@ -32,7 +44,7 @@ export default function RegisterPage() {
 
   const form = useForm<InputType>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: "", phone: "", password: "", password_confirmation: "" },
   });
 
   const onSubmit = async (values: InputType) => {
@@ -71,6 +83,19 @@ export default function RegisterPage() {
               />
               <FormField
                 control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("phone")}</FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder="09xxxxxxxxx" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -88,6 +113,19 @@ export default function RegisterPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("password")}</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="********" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password_confirmation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("confirmPassword", { default: "Confirm Password" })}</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="********" {...field} />
                     </FormControl>

@@ -62,10 +62,13 @@ export default function CustomerOrderDetailPage() {
                     className="w-16 h-16 object-contain rounded bg-white"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium truncate">{p.name}</div>
-                    <div className="text-xs text-neutral-500">
-                      {formatCurrency(p.price)}
+                    <div className="text-sm font-medium truncate flex items-center gap-2">
+                      <span className="truncate">{p.name}</span>
+                      <span className="ml-1 text-[11px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                        x{p.quantity ?? 1}
+                      </span>
                     </div>
+                    <div className="text-xs text-neutral-500">{formatCurrency(p.price)}</div>
                   </div>
                 </div>
               ))}

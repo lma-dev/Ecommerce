@@ -104,7 +104,7 @@ export const useCreateCustomer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      ToastAlert.success({ message: 'Customer deleted successfully' })
+      ToastAlert.success({ message: 'Customer created successfully' })
     },
     onError: () => {
       ToastAlert.error({ message: 'Failed to create customer' })

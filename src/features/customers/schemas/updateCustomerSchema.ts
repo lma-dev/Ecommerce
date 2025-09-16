@@ -1,4 +1,3 @@
-import { createCustomerSchema } from './createCustomerSchema'
+import { createCustomerBaseSchema } from './createCustomerSchema'
 
-export const updateCustomerSchema = createCustomerSchema.partial()
-
+export const updateCustomerSchema = createCustomerBaseSchema.partial()

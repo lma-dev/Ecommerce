@@ -55,6 +55,7 @@
     "loadingCategories": "Loading categories...",
     "loadingCustomers": "Loading customers...",
     "loadingOrders": "Loading orders...",
+    "noOrders": "No orders yet",
     "loadingProducts": "Loading products...",
     "loadingReports": "Loading reports...",
     "loadingUsers": "Loading users...",
@@ -72,6 +73,7 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "register": "Register",
+    "confirmPassword": "Confirm Password",
     "createAccount": "Create Account",
     "addToCart": "Add to Cart",
     "ourMenu": "Our Menu",
@@ -100,6 +102,7 @@
     "landingSubtitle": "Digital menus, fast checkout, and easy order tracking for your restaurant.",
     "getStarted": "Get Started",
     "learnMore": "Learn more",
+    "contactAdminForAccess": "Need access? Contact your administrator.",
     "customerLogin": "Customer Login",
     "browseMenu": "Browse our menu by category",
     "selectCategoryFirst": "Select a category to search",
@@ -181,6 +184,8 @@
     "cart": "Cart",
     "emptyCart": "Your cart is empty",
     "checkout": "Checkout",
-    "save": "Save"
+    "save": "Save",
+    "sendConfirmationEmail": "Send confirmation email",
+    "autoGeneratePassword": "Auto-generate password"
   }
 }

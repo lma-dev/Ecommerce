@@ -81,7 +81,9 @@ export const useUsersQuery = (
         queryKey: ['users', page, filters, sort],
         queryFn: () => fetchUsers(page, filters, sort),
         placeholderData: (prev) => prev,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -104,6 +106,9 @@ export const useUserQuery = (id: number) =>
         queryKey: ['user', id],
         queryFn: () => fetchUser(id),
         enabled: !!id,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -117,9 +122,9 @@ export const useCreateUser = () => {
             const res = await createData('/users', data)
             return res.data
         },
-        onSuccess: () => {
+    onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] })
-            ToastAlert.success({ message: 'User deleted successfully' })
+            ToastAlert.success({ message: 'User created successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create user" })

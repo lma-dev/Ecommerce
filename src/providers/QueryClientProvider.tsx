@@ -9,7 +9,10 @@ const TanStackQueryClientProvider = ({ children }: TanStackProviderProps) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 5 * 60 * 1000, // 5 min
+        // Fetch fresh data every 1 minute by default
+        staleTime: 60 * 1000,
+        refetchInterval: 60 * 1000,
+        refetchIntervalInBackground: true,
         refetchOnWindowFocus: false,
       },
     },

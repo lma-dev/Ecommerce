@@ -8,7 +8,28 @@ const intlMiddleware = createIntlMiddleware(routing)
 export function middleware(request: NextRequest) {
     const { pathname, search } = request.nextUrl
 
-    // Ignore API, next internals and assets (handled via matcher as well)
+    // 0) Handle API routes separately (no locale logic here)
+    if (pathname.startsWith('/api')) {
+        // Allow NextAuth endpoints without token
+        if (pathname.startsWith('/api/auth')) {
+            return NextResponse.next()
+        }
+
+        const adminToken = request.cookies.get('auth_token')?.value
+            || request.cookies.get('next-auth.session-token')?.value
+            || request.cookies.get('__Secure-next-auth.session-token')?.value
+        const customerToken = request.cookies.get('customer_token')?.value
+        const anyToken = adminToken || customerToken
+
+        if (!anyToken) {
+            return new NextResponse(
+                JSON.stringify({ message: 'Unauthorized' }),
+                { status: 401, headers: { 'content-type': 'application/json' } }
+            )
+        }
+
+        return NextResponse.next()
+    }
 
     // 1) Force locale prefix on all non-static routes
     if (pathname === '/') {
@@ -82,7 +103,9 @@ export const config = {
     matcher: [
         // Ensure root path is matched explicitly
         '/',
-        // All app routes except API, Next internals and static files
-        '/((?!api|_next|.*\\..*).*)',
+        // All app routes except Next internals and static files
+        '/((?!_next|.*\\..*).*)',
+        // Also run on API routes to enforce auth
+        '/api/:path*',
     ],
 }

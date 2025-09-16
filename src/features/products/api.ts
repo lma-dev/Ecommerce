@@ -66,7 +66,9 @@ export const useProductsQuery = (
         queryKey: ['products', page, filters],
         queryFn: () => fetchProducts(page, filters),
         placeholderData: (prev) => prev,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -89,6 +91,9 @@ export const useProductQuery = (id: number) =>
         queryKey: ['product', id],
         queryFn: () => fetchProduct(id),
         enabled: !!id,
+        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: true,
     })
 
 // ------------------------
@@ -113,7 +118,7 @@ export const useCreateProduct = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] })
-            ToastAlert.success({ message: 'Product deleted successfully' })
+            ToastAlert.success({ message: 'Product created successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create product" })
