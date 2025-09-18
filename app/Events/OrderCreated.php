@@ -2,39 +2,49 @@
 
 namespace App\Events;
 
+use App\Events\Concerns\BroadcastsOrderChannels;
 use App\Http\Resources\Order\OrderResource;
 use App\Models\Order;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
+use Illuminate\Queue\SerializesModels;
 
-class OrderCreated implements ShouldBroadcastNow
+class OrderCreated implements ShouldBroadcast
 {
+    use BroadcastsOrderChannels;
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * Capture the order instance and ensure related data is loaded for the payload.
+     */
     public function __construct(public Order $order)
     {
-        // Ensure relationships are available for payload
         $this->order->loadMissing(['customer', 'products']);
     }
 
-    public function broadcastOn(): Channel
+    /**
+     * Broadcast the event to the admin overview channel and the owning customer.
+     */
+    public function broadcastOn(): array
     {
-        // Public channel for simplicity; switch to PrivateChannel for auth
-        return new Channel('orders');
+        return $this->orderBroadcastChannels($this->order->customer_id);
     }
 
+    /**
+     * Provide a custom name so frontends can differentiate broadcast types easily.
+     */
     public function broadcastAs(): string
     {
         return 'OrderCreated';
     }
 
+    /**
+     * Serialize the order using the API resource for consistency with HTTP responses.
+     */
     public function broadcastWith(): array
     {
-        // Use existing API serializer for consistency
         return OrderResource::make($this->order)->toArray(app(Request::class));
     }
 }

@@ -80,4 +80,25 @@ class OrdersTest extends TestCase
         $res->assertOk();
         $this->assertSoftDeleted('orders', ['id' => $order->id]);
     }
+
+    public function test_index_handles_large_dataset(): void
+    {
+        $this->actingAsAdmin();
+
+        $customer = Customer::factory()->create([
+            'email' => 'bulk-orders@example.com',
+            'password' => password_hash('password', PASSWORD_BCRYPT),
+        ]);
+
+        Order::factory()
+            ->count(70)
+            ->for($customer, 'customer')
+            ->create();
+
+        $response = $this->getJson('/api/staff/orders?limit=40');
+
+        $response->assertOk()->assertJsonPath('meta.totalItems', 70);
+
+        $this->assertSame(40, count($response->json('data')));
+    }
 }

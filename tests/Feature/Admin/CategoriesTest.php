@@ -6,6 +6,7 @@ use App\Enums\UserRoleType;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -37,5 +38,23 @@ class CategoriesTest extends TestCase
         ]);
         $res->assertCreated();
         $this->assertDatabaseHas('categories', ['name' => 'Snacks']);
+    }
+
+    public function test_index_categories_handles_large_dataset(): void
+    {
+        $this->actingAsStaff();
+
+        Category::factory()
+            ->count(80)
+            ->sequence(fn (Sequence $sequence) => [
+                'name' => 'Bulk Category '.($sequence->index + 1),
+            ])
+            ->create();
+
+        $response = $this->getJson('/api/staff/categories?limit=50');
+
+        $response->assertOk()->assertJsonPath('meta.totalItems', 80);
+
+        $this->assertSame(50, count($response->json('data')));
     }
 }

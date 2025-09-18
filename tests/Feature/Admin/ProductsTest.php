@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -43,5 +44,23 @@ class ProductsTest extends TestCase
         $res = $this->postJson('/api/staff/products', $payload);
         $res->assertCreated();
         $this->assertDatabaseHas('products', ['name' => 'Tea Leaves']);
+    }
+
+    public function test_index_products_handles_large_dataset(): void
+    {
+        $this->actingAsAdmin();
+
+        Product::factory()
+            ->count(120)
+            ->sequence(fn (Sequence $sequence) => [
+                'name' => 'Bulk Product '.($sequence->index + 1),
+            ])
+            ->create();
+
+        $response = $this->getJson('/api/staff/products?limit=60');
+
+        $response->assertOk()->assertJsonPath('meta.totalItems', 120);
+
+        $this->assertSame(60, count($response->json('data')));
     }
 }

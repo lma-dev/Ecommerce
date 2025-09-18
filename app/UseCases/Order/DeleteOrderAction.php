@@ -7,6 +7,9 @@ use App\Models\Order;
 
 class DeleteOrderAction
 {
+    /**
+     * Remove an order (soft delete by default) and broadcast the deletion event.
+     */
     public function __invoke(Order $order, array $data): void
     {
         if ($data['force'] ?? false) {
@@ -19,7 +22,7 @@ class DeleteOrderAction
         $driver = config('broadcasting.default');
         $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
         if ($driver !== 'log' && $pusherReady) {
-            event(new OrderDeleted($order->id));
+            event(new OrderDeleted($order->id, $order->customer_id));
         }
     }
 }

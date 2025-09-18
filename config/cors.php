@@ -15,11 +15,14 @@ return [
     |
     */
 
-    'paths' => ['*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'broadcasting/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => array_filter([
+        env('FRONTEND_URL', 'http://localhost:3000'),
+        env('FRONTEND_LOCAL_URL'),
+    ]),
 
     'allowed_origins_patterns' => [],
 

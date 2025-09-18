@@ -13,10 +13,11 @@ return [
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
-                'host' => env('PUSHER_HOST', 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com'),
-                'port' => env('PUSHER_PORT', 443),
-                'scheme' => env('PUSHER_SCHEME', 'https'),
-                'useTLS' => env('PUSHER_SCHEME', 'https') === 'https',
+                // Fall back if env value exists but is empty
+                'host' => env('PUSHER_HOST') ?: ('api-'.(env('PUSHER_APP_CLUSTER', 'mt1')).'.pusher.com'),
+                'port' => env('PUSHER_PORT') ?: 443,
+                'scheme' => env('PUSHER_SCHEME') ?: 'https',
+                'useTLS' => (env('PUSHER_SCHEME') ?: 'https') === 'https',
             ],
         ],
 
@@ -41,4 +42,3 @@ return [
     ],
 
 ];
-

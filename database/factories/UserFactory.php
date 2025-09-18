@@ -23,7 +23,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' =>  Hash::make('12345678'), // password
+            'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
             'account_status' => $this->faker->randomElement(['ACTIVE', 'SUSPENDED']),
             'role' => $this->faker->randomElement([UserRoleType::SUPER_ADMIN,  UserRoleType::ADMIN,  UserRoleType::STAFF]),

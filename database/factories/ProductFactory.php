@@ -56,11 +56,12 @@ class ProductFactory extends Factory
 
         // Do not use unique() on small pools; handle uniqueness manually
         $baseName = $this->faker->randomElement($itemsByCategory[$categoryName]);
-        $name = $baseName;
-        // Avoid DB unique constraint collisions if base name already exists
-        if (Product::where('name', $name)->exists()) {
-            $name = $baseName.' '. $this->faker->randomElement(['Mini','Classic','Original','Family Pack','Value']) . ' ' . $this->faker->numerify('##');
-        }
+
+        // Always decorate the base name with a short random suffix to dodge the unique constraint.
+        do {
+            $suffix = Str::upper(Str::random(3)).$this->faker->numerify('##');
+            $name = $baseName.' '.$suffix;
+        } while (Product::where('name', $name)->exists());
 
         return [
             'name'        => $name,
