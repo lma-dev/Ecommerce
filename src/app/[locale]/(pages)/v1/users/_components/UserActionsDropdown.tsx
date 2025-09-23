@@ -55,16 +55,6 @@ export const UserActionDropdown: React.FC<UserActionDropdownProps> = ({
       <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuLabel>{t("setting")}</DropdownMenuLabel>
 
-        <DropdownMenuItem asChild>
-          <Link
-            href={`/${locale}/users/${user.id}/location`}
-            className="w-full"
-          >
-            <MapPinned className="mr-2 h-4 w-4" />
-            {t("requestLocation")}
-          </Link>
-        </DropdownMenuItem>
-
         <DropdownMenuItem onSelect={handleExportClick}>
           <Download className="mr-2 h-4 w-4" />
           {t("export")}

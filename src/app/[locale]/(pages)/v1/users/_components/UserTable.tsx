@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,8 +26,19 @@ import {
 import { useUsersQuery } from "@/features/users/api";
 import { createUserColumns } from "./UserTableColumns";
 import { PaginationFooter } from "@/app/[locale]/_components/ui/pagination-footer";
+import {
+  userRoleLabel,
+  userRoleOptions,
+  UserRoleType,
+} from "@/features/users/constants/role";
+import {
+  userAccountStatusOptions,
+  UserAccountStatusType,
+} from "@/features/users/constants/status";
 
 type DialogType = "delete" | "export" | null;
+type RoleSelectValue = UserRoleType | "clear";
+type StatusSelectValue = UserAccountStatusType | "clear";
 
 interface UserTableProps {
   showDialog: (type: DialogType, method: () => void) => void;
@@ -36,85 +47,135 @@ interface UserTableProps {
 
 const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
   const [page, setPage] = useState(1);
-  const [roleFilter, setRoleFilter] = useState<string | undefined>(undefined);
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(
-    undefined
-  );
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  // local-only filters (no refetch)
+  const [roleFilter, setRoleFilter] = useState<RoleSelectValue>("clear");
+  const [statusFilter, setStatusFilter] = useState<StatusSelectValue>("clear");
+
+  // search: draft vs committed
   const [searchFilter, setSearchFilter] = useState("");
+  const [committedSearch, setCommittedSearch] = useState("");
 
   const locale = useLocale();
 
-  const { data, isLoading, refetch } = useUsersQuery(page, {
-    role: roleFilter,
-    generalSearch: searchFilter,
-    accountStatus: statusFilter,
+  // backend query: only page + committed search drive it
+  const { data, isLoading } = useUsersQuery(page, {
+    role: undefined, // keep unfiltered on backend
+    generalSearch: committedSearch || undefined,
+    accountStatus: undefined, // keep unfiltered on backend
   });
 
-  const userColumns = createUserColumns(showDialog);
+  const userColumns = createUserColumns(showDialog, t);
+
+  // client-side role + status filtering
+  const filteredRows = useMemo(() => {
+    const rows = data?.data ?? [];
+    return rows.filter((u: any) => {
+      const roleOk = roleFilter === "clear" || u.role === roleFilter;
+      const statusOk =
+        statusFilter === "clear" || u.accountStatus === statusFilter;
+      return roleOk && statusOk;
+    });
+  }, [data?.data, roleFilter, statusFilter]);
 
   const table = useReactTable({
-    data: data?.data ?? [],
+    data: filteredRows,
     columns: userColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (isLoading) return <div>{t("loadingUsers")}</div>;
+  const renderSkeleton = () => (
+    <div className="rounded-md border overflow-hidden">
+      <div className="divide-y">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="p-4 animate-pulse">
+            <div className="h-4 bg-muted rounded w-3/4" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+        {/* Mobile filter toggle */}
+        <div className="flex items-center justify-between md:hidden">
+          <button
+            className="rounded-md border px-3 py-2 text-sm"
+            onClick={() => setMobileFiltersOpen((v) => !v)}
+          >
+            {t("filterOptions")}
+          </button>
+          <Link href={`/${locale}/v1/users/create`} className="inline-flex items-center">
+            <Button>{t("createUser")}</Button>
+          </Link>
+        </div>
+
+        <div className={`${mobileFiltersOpen ? '' : 'hidden md:flex'} grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-4 w-full min-w-0`}>
           <Input
-            placeholder="Search by name or email"
+            placeholder={t("searchByNameOrEmail")}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            onBlur={() => refetch()}
+            onBlur={() => setCommittedSearch(searchFilter)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") setCommittedSearch(searchFilter);
+            }}
+            className="w-full md:w-auto"
           />
 
           <Select
             value={roleFilter}
-            onValueChange={(val) => {
-              setRoleFilter(val || undefined);
-              refetch();
-            }}
+            onValueChange={(val) => setRoleFilter(val as RoleSelectValue)}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Role" />
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder={t("filterByRole")} />
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="ADMIN">Admin</SelectItem>
-              <SelectItem value="MEMBER">Member</SelectItem>
-              <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-              <SelectItem value="clear">All Roles</SelectItem>
+              <SelectItem value="clear">{t("allRoles")}</SelectItem>
+              {userRoleOptions.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {userRoleLabel[role]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
           <Select
             value={statusFilter}
-            onValueChange={(val) => {
-              setStatusFilter(val || undefined);
-              refetch();
-            }}
+            onValueChange={(val) => setStatusFilter(val as StatusSelectValue)}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Status" />
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder={t("filterByStatus")} />
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="ACTIVE">{t("active")}</SelectItem>
-              <SelectItem value="SUSPENDED">{t("suspend")}</SelectItem>
-              <SelectItem value="clear">All Statuses</SelectItem>
+              <SelectItem value="clear">{t("allStatuses")}</SelectItem>
+              {userAccountStatusOptions.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status === "ACTIVE" ? t("active") : t("suspend")}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
         <Link
           href={`/${locale}/v1/users/create`}
-          className="inline-flex items-center"
+          className="hidden md:inline-flex items-center md:self-auto self-end"
         >
           <Button>{t("createUser")}</Button>
         </Link>
       </div>
+
+      {/* No results state */}
+      {!isLoading && filteredRows.length === 0 && (
+        <div className="rounded-md border p-6 text-center text-sm text-muted-foreground">
+          {t("noData")} — {t("resetAll")} / {t("clear")}
+        </div>
+      )}
 
       <div className="rounded-md border overflow-x-auto">
         <Table>
@@ -134,8 +195,13 @@ const UserTable: React.FC<UserTableProps> = ({ showDialog, t }) => {
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={table.getAllColumns().length}>{renderSkeleton()}</TableCell>
+              </TableRow>
+            )}
+            {!isLoading && table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="hover:bg-accent/40 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

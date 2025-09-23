@@ -11,8 +11,8 @@ export default function ReportEditPage() {
   const { data: report, isLoading } = useReportQuery(Number(id));
   const t = useTranslations("Translation");
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!report) return <div>Report not found</div>;
+  if (isLoading) return <div>{t("loadingReports")}</div>;
+  if (!report) return <div>{t("reportNotFound", { default: "Report not found" })}</div>;
 
   return (
     <div>

@@ -41,7 +41,7 @@ const UserPage = () => {
   return (
     <div>
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">User Lists</h1>
+        <h1 className="text-2xl font-semibold">{t("userList")}</h1>
         <UserTable showDialog={showDialog} t={t} />
       </div>
       {dialog.type && (

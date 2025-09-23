@@ -104,7 +104,7 @@ export const createReportColumns = (
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => t("actions"),
     cell: ({ row }) => {
       const report = row.original;
       return <ReportActionDropdown report={report} showDialog={showDialog} />;

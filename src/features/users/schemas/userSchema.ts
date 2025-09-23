@@ -1,11 +1,14 @@
 import { z } from 'zod'
 import { createUserSchema } from '@/features/users/schemas/createUserSchema'
 
-export const userSchema = createUserSchema.extend({
+// Extend the fetched user with id and timestamps which exist in API payloads
+export const userSchema = createUserSchema
+  .partial()
+  .omit({ password: true })
+  .extend({
     id: z.number(),
-    createdAt: z.string().nullable().optional(),
-}).omit({
-    password: true // Remove password from the fetched user schema
-})
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  })
 
 export const userListSchema = z.array(userSchema)

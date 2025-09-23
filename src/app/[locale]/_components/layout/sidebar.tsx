@@ -14,16 +14,11 @@ export function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
 
   const links = [
     { label: t("dashboard"), href: `/${locale}/${version}/dashboard` },
-    { label: t("report"), href: `/${locale}/${version}/reports` },
-    { label: t("regularCost"), href: `/${locale}/${version}/regular-costs` },
-    {
-      label: t("depositRequest"),
-      href: `/${locale}/${version}/deposit-requests`,
-    },
-    { label: t("user"), href: `/${locale}/${version}/users` },
-    { label: t("chatRoom"), href: `/${locale}/${version}/chat-room` },
-    { label: t("announcement"), href: `/${locale}/${version}/announcement` },
-    { label: t("setting"), href: `/${locale}/${version}/settings` },
+    { label: t("categories"), href: `/${locale}/${version}/categories` },
+    { label: t("products"), href: `/${locale}/${version}/products` },
+    { label: t("orders"), href: `/${locale}/${version}/orders` },
+    { label: t("users"), href: `/${locale}/${version}/users` },
+    { label: t("customers"), href: `/${locale}/${version}/customers` },
   ];
 
   return (
@@ -34,10 +29,10 @@ export function Sidebar({ onLinkClick }: { onLinkClick?: () => void }) {
           href={link.href}
           onClick={onLinkClick}
           className={cn(
-            "rounded-md px-3 py-2 hover:bg-muted transition-colors",
+            "rounded-md px-3 py-2 hover:bg-muted transition-colors border-l-2",
             pathname === link.href
-              ? "bg-muted font-semibold"
-              : "text-muted-foreground"
+              ? "bg-muted font-semibold border-primary"
+              : "text-muted-foreground border-transparent"
           )}
         >
           {link.label}

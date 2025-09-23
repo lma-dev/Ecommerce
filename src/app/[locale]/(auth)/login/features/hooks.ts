@@ -24,11 +24,26 @@ export const useLogout = () => {
 
     return async () => {
         try {
+            // Best-effort clear of app-specific cookies
+            const expire = 'Thu, 01 Jan 1970 00:00:00 GMT'
+            const clear = (name: string) => {
+                try { document.cookie = `${name}=; expires=${expire}; path=/`; } catch {}
+            }
+            ;[
+                'auth_token',
+                'auth_role',
+                'customer_token',
+                'next-auth.session-token',
+                '__Secure-next-auth.session-token',
+                'next-auth.csrf-token'
+            ].forEach(clear)
+            // NextAuth will clear its own cookies
             await signOut({ callbackUrl: `/${currentLocale}/login` })
         } catch (e) {
             console.warn('Logout failed:', e)
         } finally {
             router.push(`/${currentLocale}/login`)
+            router.refresh()
         }
     }
 }
