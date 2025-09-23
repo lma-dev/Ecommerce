@@ -1,4 +1,4 @@
-import axios from '@/libs/axios'
+import axios from "@/libs/axios";
 
 export type CustomerLoginInput = { email: string; password: string }
 export type CustomerLoginResponse = {
@@ -10,7 +10,6 @@ export type CustomerLoginResponse = {
 export const customerLogin = async (
   payload: CustomerLoginInput,
 ): Promise<CustomerLoginResponse> => {
-  const res = await axios.post('/customer/login', payload)
-  return res.data
-}
-
+  const res = await axios.post("/customer/login", payload);
+  return res.data;
+};

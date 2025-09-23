@@ -5,11 +5,23 @@ import { useCustomerOrder } from "@/features/customer/orders/api";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { resolveAssetUrl } from "@/libs/assets";
+import { useCustomerProfile } from "@/features/customer/profile/api";
+import { useRealtimeOrders } from "@/features/orders/useRealtimeOrders";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function CustomerOrderDetailPage() {
   const t = useTranslations("Translation");
   const params = useParams() as { id?: string };
   const id = params?.id;
+  const numericId = id ? Number(id) : undefined;
+  const { data: profile } = useCustomerProfile();
+  useRealtimeOrders({
+    orderId: numericId,
+    customerId: profile?.id,
+    includeGlobalChannel: false,
+  });
   const { data: order, isLoading } = useCustomerOrder(id);
 
   return (
@@ -17,6 +29,19 @@ export default function CustomerOrderDetailPage() {
       <CustomerTopbar />
 
       <section className="max-w-4xl mx-auto w-full space-y-4">
+        <Link
+          href={{ pathname: "/customer/orders" }}
+          aria-label={t("backToOrders") as string}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-2 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>{t("back")}</span>
+          </Button>
+        </Link>
         <h1 className="text-2xl font-bold">
           {t("orders")} #{id}
         </h1>
@@ -68,7 +93,9 @@ export default function CustomerOrderDetailPage() {
                         x{p.quantity ?? 1}
                       </span>
                     </div>
-                    <div className="text-xs text-neutral-500">{formatCurrency(p.price)}</div>
+                    <div className="text-xs text-neutral-500">
+                      {formatCurrency(p.price)}
+                    </div>
                   </div>
                 </div>
               ))}

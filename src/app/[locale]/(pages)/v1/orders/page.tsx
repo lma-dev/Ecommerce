@@ -5,6 +5,7 @@ import { useState } from "react";
 import OrderTable from "@/v1/orders/_components/OrderTable";
 import { ConfirmDialog } from "@/app/[locale]/_components/ui/confirm-dialog";
 import { RealtimeOrdersListener } from "@/features/orders/useRealtimeOrders";
+import React from "react";
 
 type DialogType = "delete" | null;
 
@@ -35,6 +36,7 @@ const OrdersPage = () => {
         <h1 className="text-2xl font-semibold">{t("orderList")}</h1>
         <OrderTable showDialog={showDialog} t={t} />
         <RealtimeOrdersListener />
+        <RealtimeStatusNote />
       </div>
       {dialog.type && (
         <ConfirmDialog
@@ -50,3 +52,13 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
+
+function RealtimeStatusNote() {
+  return (
+    <div className="text-[12px] text-muted-foreground">
+      Realtime: Listens on channel <code>orders</code>. Configure via
+      <code> NEXT_PUBLIC_PUSHER_ORDERS_CHANNEL</code> and optional
+      <code> NEXT_PUBLIC_PUSHER_EXTRA_CHANNEL/NEXT_PUBLIC_PUSHER_EXTRA_EVENT</code> for testing.
+    </div>
+  );
+}

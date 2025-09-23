@@ -83,7 +83,6 @@ const ProductForm = ({
     useCategoriesQuery(1, {});
 
   const onSubmit = (values: any) => {
-    console.log(values);
     if (mode === "edit" && defaultValues?.id) {
       update.mutate(
         { id: defaultValues.id, ...values },

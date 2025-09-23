@@ -43,7 +43,6 @@ export const fetchCategories = async (
         params.set('isActive', filters.isActive)
     }
 
-    console.log(params.toString(), "params---");
     const res = await fetchAllData(`/categories?${params.toString()}`)
     const result = categoryListSchema.safeParse(res.data)
 

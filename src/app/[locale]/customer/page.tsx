@@ -22,8 +22,6 @@ export default function CustomerHomePage() {
     categoryId,
   });
 
-  console.log("Categories:", categories);
-  console.log("Products:", products);
   // Auto-select first category for a book-reading flow
   useEffect(() => {
     if (!categoryId && categories && categories.length > 0) {

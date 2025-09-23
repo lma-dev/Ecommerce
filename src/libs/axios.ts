@@ -1,14 +1,36 @@
 import Axios from 'axios'
+import type { InternalAxiosRequestConfig } from 'axios'
+import { ensureSanctumCookie, getXsrfToken } from "@/libs/sanctum"
 
 const apiConfig = {
     baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
     withCredentials: true,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
     headers: {
-        // 'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
     }
 }
-console.log('API URL:', apiConfig.baseURL);
+
 const axios = Axios.create(apiConfig)
+
+axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+    const method = (config.method || 'get').toUpperCase()
+    const headers = { ...(config.headers || {}) } as Record<string, string>
+    const needsCsrf = method !== 'GET' && config.withCredentials !== false
+
+    if (needsCsrf) {
+        let xsrf = getXsrfToken()
+        if (!xsrf) {
+            await ensureSanctumCookie(true)
+            xsrf = getXsrfToken()
+        }
+        if (xsrf) headers['X-XSRF-TOKEN'] = xsrf
+    }
+
+    config.headers = headers
+    return config
+})
 
 export default axios

@@ -4,9 +4,13 @@ import CustomerTopbar from "../_components/CustomerTopbar";
 import { useCustomerOrders } from "@/features/customer/orders/api";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useCustomerProfile } from "@/features/customer/profile/api";
+import { useRealtimeOrders } from "@/features/orders/useRealtimeOrders";
 
 export default function CustomerOrdersPage() {
   const t = useTranslations("Translation");
+  const { data: profile } = useCustomerProfile();
+  useRealtimeOrders({ customerId: profile?.id, includeGlobalChannel: false });
   const { data: orders, isLoading } = useCustomerOrders();
 
   return (
