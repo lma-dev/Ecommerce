@@ -27,9 +27,9 @@ class OrderController extends Controller
     }
 
     /** GET /staff/Orders/{Order} */
-    public function show(Order $Order)
+    public function show(Order $order)
     {
-        $data = (new DetailOrderAction())($Order);
+        $data = (new DetailOrderAction())($order);
         return ResponseHelper::success(
             "Success",
             new OrderResource($data)

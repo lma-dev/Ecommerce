@@ -3,6 +3,7 @@
 namespace App\UseCases\Order;
 
 use App\Enums\OrderStatusType;
+use App\Events\OrderUpdated;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,10 @@ class UpdateOrderAction
             $notes = $data['notes'] ?? null;
             $shippingAddress = $data['shippingAddress'] ?? null;
 
-            $oldProductIds = $order->products()->pluck('products.id')->all();
+            $oldProducts = $order->products()->get(['products.id', 'order_product.quantity']);
+            $oldProductQuantities = $oldProducts->mapWithKeys(function ($p) {
+                return [$p->id => (int) $p->pivot->quantity];
+            })->all();
 
             $order->update(array_filter([
                 'customer_id'      => $customerId,
@@ -28,10 +32,18 @@ class UpdateOrderAction
             ], fn($v) => !is_null($v)));
 
             if (array_key_exists('productIds', $data)) {
-                $productIds = array_values(array_unique($productIds));
-                $order->products()->sync($productIds);
+                $counts = array_count_values($productIds);
+                $sync = [];
+                foreach ($counts as $productId => $qty) {
+                    $sync[$productId] = ['quantity' => (int) $qty];
+                }
+                $order->products()->sync($sync);
+                $productQuantities = $counts;
             } else {
-                $productIds = $order->products()->pluck('products.id')->all();
+                $current = $order->products()->get(['products.id', 'order_product.quantity']);
+                $productQuantities = $current->mapWithKeys(function ($p) {
+                    return [$p->id => (int) $p->pivot->quantity];
+                })->all();
             }
 
             $subtotal = $order->subtotal();
@@ -45,15 +57,24 @@ class UpdateOrderAction
                 'customer_id' => $order->customer_id,
                 'old_data'    => [
                     'order'       => $order->only(['id', 'customer_id', 'status', 'notes', 'total_amount']),
-                    'product_ids' => $oldProductIds,
+                    'product_quantities' => $oldProductQuantities,
                 ],
                 'new_data'    => [
                     'order'       => $order->only(['id', 'customer_id', 'status', 'notes', 'total_amount']),
-                    'product_ids' => $productIds,
+                    'product_quantities' => $productQuantities,
                 ],
             ]);
 
-            return $order->load('products');
+            $order = $order->load(['customer', 'products']);
+
+            // Broadcast update for realtime clients (only if broadcaster available)
+            $driver = config('broadcasting.default');
+            $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
+            if ($driver !== 'log' && $pusherReady) {
+                event(new OrderUpdated($order));
+            }
+
+            return $order;
         });
     }
 }

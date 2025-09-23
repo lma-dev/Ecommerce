@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // ---- Public (unauthenticated) endpoints ----
