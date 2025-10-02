@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -87,7 +88,7 @@ class OrdersTest extends TestCase
 
         $customer = Customer::factory()->create([
             'email' => 'bulk-orders@example.com',
-            'password' => password_hash('password', PASSWORD_BCRYPT),
+            'password' => Hash::make('password'),
         ]);
 
         Order::factory()
