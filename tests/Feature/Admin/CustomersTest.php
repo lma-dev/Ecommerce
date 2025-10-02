@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -47,7 +48,7 @@ class CustomersTest extends TestCase
     {
         $this->actingAsAdmin();
 
-        $hashedPassword = password_hash('password', PASSWORD_BCRYPT);
+        $hashedPassword = Hash::make('password');
 
         Customer::factory()
             ->count(80)

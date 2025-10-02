@@ -8,7 +8,6 @@ Route::prefix('staff')->group(function () {
     // Password reset (staff)
     Route::post('forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store']);
     Route::post('reset-password', [\App\Http\Controllers\Auth\NewPasswordController::class, 'store']);
-    // (optional) staff register if you support it
 });
 
 Route::prefix('customer')->group(function () {
@@ -19,6 +18,12 @@ Route::prefix('customer')->group(function () {
     // Password reset (customer)
     Route::post('forgot-password', [\App\Http\Controllers\Auth\CustomerPasswordResetLinkController::class, 'store']);
     Route::post('reset-password', [\App\Http\Controllers\Auth\CustomerNewPasswordController::class, 'store']);
+    Route::get('email/verify/{id}/{hash}', [\App\Http\Controllers\Auth\CustomerEmailVerificationController::class, 'verify'])
+        ->middleware('signed')
+        ->name('customer.verification.verify');
+    Route::post('email/resend', [\App\Http\Controllers\Auth\CustomerEmailVerificationController::class, 'resend'])
+        ->middleware(['auth:sanctum', 'tokenable:customer'])
+        ->name('customer.verification.resend');
 });
 
 // ---- Protected groups mount their own sub-files ----
