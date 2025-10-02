@@ -59,9 +59,11 @@ export function middleware(request: NextRequest) {
     const isAdminOnly = pathname.startsWith(`/${currentLocale}/v1/admin`)
     const isSuperOnly = pathname.startsWith(`/${currentLocale}/v1/super`)
     const isPublic = pathname === `/${currentLocale}` || pathname === `/${currentLocale}/login`
+    const isForgotPassword = pathname.startsWith(`/${currentLocale}/forgot-password`)
+    const isResetPassword = pathname.startsWith(`/${currentLocale}/password-reset`)
 
-    // Public pages: landing and login
-    if (isPublic) {
+    // Public pages: landing, login, forgot/reset password
+    if (isPublic || isForgotPassword || isResetPassword) {
         return intlMiddleware(request)
     }
 
