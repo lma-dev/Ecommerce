@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +20,8 @@ import axios from "@/libs/axios";
 import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
 import Link from "next/link";
 
+const SUPPORTED_LOCALES = ["en", "jp", "mm"] as const;
+
 const schema = z
   .object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -30,6 +34,7 @@ const schema = z
     password_confirmation: z
       .string()
       .min(8, { message: "Confirm Password must be at least 8 characters" }),
+    locale: z.enum(SUPPORTED_LOCALES),
   })
   .refine((data) => data.password === data.password_confirmation, {
     path: ["password_confirmation"],
@@ -41,18 +46,44 @@ type InputType = z.infer<typeof schema>;
 export default function RegisterPage() {
   const t = useTranslations("Translation");
   const locale = useLocale();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isSupportedLocale = (
+    value: string,
+  ): value is InputType["locale"] =>
+    SUPPORTED_LOCALES.includes(value as InputType["locale"]);
+
+  const resolvedLocale = isSupportedLocale(locale) ? locale : "en";
 
   const form = useForm<InputType>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", password: "", password_confirmation: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+      password_confirmation: "",
+      locale: resolvedLocale,
+    },
   });
 
+  useEffect(() => {
+    form.setValue("locale", resolvedLocale, { shouldValidate: false });
+  }, [form, resolvedLocale]);
+
   const onSubmit = async (values: InputType) => {
+    setIsSubmitting(true);
     try {
       await axios.post("/customer/register", values);
-      ToastAlert.success({ message: t("createSuccess") });
+      ToastAlert.success({
+        message: t("verificationEmailSent", { email: values.email }),
+      });
+      router.replace(`/${resolvedLocale}/login`);
     } catch (e) {
-      ToastAlert.error({ message: t("loginFailed") });
+      ToastAlert.error({ message: t("registerFailed") });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -68,6 +99,7 @@ export default function RegisterPage() {
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <input type="hidden" {...form.register("locale")} />
               <FormField
                 control={form.control}
                 name="name"
@@ -133,8 +165,8 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                {t("register")}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? t("processing") : t("register")}
               </Button>
             </form>
           </Form>
