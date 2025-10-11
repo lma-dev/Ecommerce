@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductImage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -23,28 +22,57 @@ class ProductFactory extends Factory
         // Curated mini shop item names grouped by rough category
         $itemsByCategory = [
             'Beverages' => [
-                'Myanmar Tea Mix', 'Coffee 3-in-1', 'Milo Pack', 'Coca-Cola 1.25L', 'Sprite 1.25L', 'Bottled Water 1L'
+                'Myanmar Tea Mix',
+                'Coffee 3-in-1',
+                'Milo Pack',
+                'Coca-Cola 1.25L',
+                'Sprite 1.25L',
+                'Bottled Water 1L'
             ],
             'Snacks' => [
-                'Potato Chips', 'Prawn Crackers', 'Wafer Sticks', 'Chocolate Bar', 'Peanut Snacks'
+                'Potato Chips',
+                'Prawn Crackers',
+                'Wafer Sticks',
+                'Chocolate Bar',
+                'Peanut Snacks'
             ],
             'Staples' => [
-                'Premium Rice 1kg', 'Cooking Oil 1L', 'Sugar 1kg', 'Iodized Salt 500g', 'Wheat Flour 1kg'
+                'Premium Rice 1kg',
+                'Cooking Oil 1L',
+                'Sugar 1kg',
+                'Iodized Salt 500g',
+                'Wheat Flour 1kg'
             ],
             'Canned & Instant' => [
-                'Instant Noodles', 'Canned Tuna', 'Canned Beans', 'Tomato Paste', 'Curry Paste Sachet'
+                'Instant Noodles',
+                'Canned Tuna',
+                'Canned Beans',
+                'Tomato Paste',
+                'Curry Paste Sachet'
             ],
             'Dairy & Eggs' => [
-                'Fresh Milk 1L', 'Condensed Milk', 'Cheddar Cheese', 'Salted Butter'
+                'Fresh Milk 1L',
+                'Condensed Milk',
+                'Cheddar Cheese',
+                'Salted Butter'
             ],
             'Bakery' => [
-                'White Bread Loaf', 'Sweet Buns', 'Crackers Pack'
+                'White Bread Loaf',
+                'Sweet Buns',
+                'Crackers Pack'
             ],
             'Household' => [
-                'Laundry Detergent', 'Dishwashing Liquid', 'Garbage Bags', 'Toilet Paper 10s'
+                'Laundry Detergent',
+                'Dishwashing Liquid',
+                'Garbage Bags',
+                'Toilet Paper 10s'
             ],
             'Personal Care' => [
-                'Shampoo 200ml', 'Bath Soap', 'Toothpaste 140g', 'Toothbrush', 'Face Tissue Pack'
+                'Shampoo 200ml',
+                'Bath Soap',
+                'Toothpaste 140g',
+                'Toothbrush',
+                'Face Tissue Pack'
             ],
         ];
 
@@ -59,8 +87,8 @@ class ProductFactory extends Factory
 
         // Always decorate the base name with a short random suffix to dodge the unique constraint.
         do {
-            $suffix = Str::upper(Str::random(3)).$this->faker->numerify('##');
-            $name = $baseName.' '.$suffix;
+            $suffix = Str::upper(Str::random(3)) . $this->faker->numerify('##');
+            $name = $baseName . ' ' . $suffix;
         } while (Product::where('name', $name)->exists());
 
         return [

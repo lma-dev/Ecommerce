@@ -9,14 +9,15 @@ use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource("users", UserController::class)
-    ->middleware('role:ADMIN,SUPER_ADMIN');
-Route::apiResource("customers", CustomerController::class)
-    ->middleware('role:ADMIN,SUPER_ADMIN,STAFF');
+Route::middleware('role:ADMIN,SUPER_ADMIN')->group(function () {
+    Route::apiResource('users', UserController::class);
+});
 
-Route::apiResource("orders", OrderController::class);
-Route::apiResource('products', ProductController::class);
-Route::apiResource('categories', CategoryController::class);
+Route::middleware('role:ADMIN,SUPER_ADMIN,STAFF')->group(function () {
+    Route::apiResource('customers', CustomerController::class);
+    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('categories', CategoryController::class);
+});
 
-// Dashboard summary counts
 Route::get('dashboard', [DashboardController::class, 'index']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Customer;
 
+use App\Enums\AppModeType;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\FetchProductRequest;
@@ -16,13 +17,13 @@ class ProductController extends Controller
     public function index(FetchProductRequest $request)
     {
         $validated = $request->safe()->all();
-        return (new GetProductAction())($validated);
+        return (new GetProductAction())($validated, AppModeType::CUSTOMER_MODE->value);
     }
 
     /** GET /customer/products/{product} */
     public function show(Product $product)
     {
-        $data = (new DetailProductAction())($product);
+        $data = (new DetailProductAction())($product, AppModeType::CUSTOMER_MODE->value);
         return ResponseHelper::success('Success', new ProductResource($data->load(['category', 'image'])));
     }
 }

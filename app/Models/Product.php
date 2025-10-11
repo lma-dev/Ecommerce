@@ -16,18 +16,12 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
-    protected $fillable = ['name', 'price', 'description', 'category_id', 'is_active'];
+    protected $fillable = ['name', 'price', 'description', 'category_id', 'is_active', 'image_id'];
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
-
-    public function image(): HasOne
-    {
-        return $this->hasOne(ProductImage::class);
-    }
-
     /**
      * Get the orders associated with the product.
      */
@@ -36,5 +30,10 @@ class Product extends Model
         return $this->belongsToMany(Order::class, 'order_product')
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Image::class, 'image_id', 'id');
     }
 }

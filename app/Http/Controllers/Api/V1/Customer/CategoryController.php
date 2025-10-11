@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Customer;
 
+use App\Enums\AppModeType;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\FetchCategoryRequest;
@@ -16,7 +17,7 @@ class CategoryController extends Controller
     public function index(FetchCategoryRequest $request)
     {
         $validated = $request->safe()->all();
-        return (new GetCategoryAction())($validated);
+        return (new GetCategoryAction())($validated, AppModeType::CUSTOMER_MODE->value);
     }
 
     /** GET /customer/categories/{category} */
@@ -26,4 +27,3 @@ class CategoryController extends Controller
         return ResponseHelper::success('Success', new CategoryResource($data));
     }
 }
-

@@ -2,53 +2,55 @@
 
 namespace App\UseCases\Product;
 
+use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Http\UploadedFile;
 
 class UpdateProductAction
 {
     public function __invoke(Product $product, array $data): Product
     {
         return DB::transaction(function () use ($product, $data) {
-            $image = array_key_exists('image', $data) ? $data['image'] : null;
-            unset($data['image']);
+            $updatePayload = [];
 
-            if (!empty($data)) {
-                $product->update([
-                    'name'        => $data['name'],
-                    'price'      => $data['price'],
-                    'category_id' => $data['categoryId'],
-                    'is_active'  => $data['isActive'],
-                    'description' => $data['description'],
-                ]);
+            if (array_key_exists('name', $data)) {
+                $updatePayload['name'] = $data['name'];
             }
 
-            if ($image !== null) {
-                if ($image) {
-                    $imageUrl = null;
+            if (array_key_exists('price', $data)) {
+                $updatePayload['price'] = $data['price'];
+            }
 
-                    if ($image instanceof UploadedFile) {
-                        $directory = public_path('uploads/products');
-                        if (! File::exists($directory)) {
-                            File::makeDirectory($directory, 0755, true);
-                        }
+            if (array_key_exists('categoryId', $data)) {
+                $updatePayload['category_id'] = $data['categoryId'];
+            }
 
-                        $filename = uniqid('product_') . '.' . $image->getClientOriginalExtension();
-                        $image->move($directory, $filename);
+            if (array_key_exists('isActive', $data)) {
+                $updatePayload['is_active'] = $data['isActive'];
+            }
 
-                        $imageUrl = '/uploads/products/' . $filename;
-                    } else {
-                        $imageUrl = (string) $image;
-                    }
+            if (array_key_exists('description', $data)) {
+                $updatePayload['description'] = $data['description'];
+            }
 
-                    // upsert single image
-                    $product->image()->updateOrCreate([], ['url' => $imageUrl]);
-                } else {
-                    // remove image
-                    $product->image()->delete();
-                }
+            if (!empty($updatePayload)) {
+                $product->update($updatePayload);
+            }
+
+            $imagePayload = data_get($data, 'image');
+
+            if (is_array($imagePayload) && !empty($imagePayload)) {
+                $image = Image::create([
+                    'provider'  => 'cloudinary',
+                    'public_id' => data_get($imagePayload, 'public_id'),
+                    'url'       => data_get($imagePayload, 'url'),
+                    'format'    => data_get($imagePayload, 'format'),
+                    'width'     => data_get($imagePayload, 'width'),
+                    'height'    => data_get($imagePayload, 'height'),
+                    'bytes'     => data_get($imagePayload, 'bytes'),
+                ]);
+
+                $product->update(['image_id' => $image->id]);
             }
 
             return $product->refresh()->load(['image', 'category']);

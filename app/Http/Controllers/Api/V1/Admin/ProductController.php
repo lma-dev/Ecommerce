@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Enums\AppModeType;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\FetchProductRequest;
@@ -21,14 +22,14 @@ class ProductController extends Controller
     public function index(FetchProductRequest $request)
     {
         $validated = $request->safe()->all();
-        $data = (new GetProductAction())($validated);
+        $data = (new GetProductAction())($validated, AppModeType::ADMIN_MODE->value);
         return $data;
     }
 
     /** GET /staff/Products/{Product} */
-    public function show(Product $Product)
+    public function show(Product $product)
     {
-        $data = (new DetailProductAction())($Product);
+        $data = (new DetailProductAction())($product, AppModeType::ADMIN_MODE->value);
         return ResponseHelper::success(
             "Success",
             new ProductResource($data)
@@ -38,21 +39,24 @@ class ProductController extends Controller
     /** POST /staff/Products */
     public function store(StoreProductRequest $request)
     {
-        $validated = $request->safe()->all();
-        $Product = (new StoreProductAction())($validated);
+        $this->authorize('create', Product::class);
 
+        $validated = $request->safe()->all();
+        $product = (new StoreProductAction())($validated);
         return ResponseHelper::success(
             "Product created successfully",
-            new ProductResource($Product),
+            new ProductResource($product),
             201
         );
     }
 
     /** PUT/PATCH /staff/Products/{Product} */
-    public function update(UpdateProductRequest $request, Product $Product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
+        $this->authorize('update', $product);
+
         $validated = $request->safe()->all();
-        $data = (new UpdateProductAction())($Product, $validated);
+        $data = (new UpdateProductAction())($product, $validated);
 
         return ResponseHelper::success(
             "Product updated successfully",
@@ -61,13 +65,15 @@ class ProductController extends Controller
     }
 
     /** DELETE /staff/Products/{Product} */
-    public function destroy(Product $Product)
+    public function destroy(Product $product)
     {
-        $data = (new DeleteProductAction())($Product);
+        $this->authorize('delete', $product);
+
+        (new DeleteProductAction())($product);
 
         return ResponseHelper::success(
             "Product deleted successfully",
-            new ProductResource($data)
+            null
         );
     }
 }

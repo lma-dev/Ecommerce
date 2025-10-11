@@ -67,7 +67,7 @@ class CustomerController extends Controller
 
         return ResponseHelper::success(
             "Customer deleted successfully",
-            new CustomerResource($data)
+            null
         );
     }
 }

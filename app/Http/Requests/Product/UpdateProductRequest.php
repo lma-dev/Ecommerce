@@ -31,11 +31,17 @@ class UpdateProductRequest extends FormRequest
                 Rule::unique('products', 'name')->ignore($this->route('product')?->id),
             ],
             'price'       => 'sometimes|numeric|min:0',
-            // Allow partial updates without forcing categoryId each time
             'categoryId'  => 'sometimes|integer|exists:categories,id',
             'isActive'    => ['sometimes', 'string', Rule::in(VisibilityStatusType::getAllStatuses())],
-            'image'       => ['nullable', 'file', 'image', 'max:2048'],
             'description' => 'sometimes|string|max:1000',
+
+            #Cloudinary image upload fields
+            'image.public_id'     => ['sometimes', 'required', 'string', 'max:255'],
+            'image.url'           => ['sometimes', 'required', 'url', 'max:2048', 'regex:/^https:\/\/res\.cloudinary\.com\//i'],
+            'image.format'        => ['sometimes', 'nullable', 'string', 'max:16'],
+            'image.width'         => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'image.height'        => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'image.bytes'         => ['sometimes', 'nullable', 'integer', 'min:1'],
         ];
     }
 }
