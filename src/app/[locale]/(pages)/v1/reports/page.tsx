@@ -13,7 +13,7 @@ interface DialogState {
   method: (() => void) | null;
 }
 
-const reportPage = () => {
+const ReportPage = () => {
   const [dialog, setDialog] = useState<DialogState>({
     open: false,
     type: null,
@@ -57,4 +57,4 @@ const reportPage = () => {
   );
 };
 
-export default reportPage;
+export default ReportPage;

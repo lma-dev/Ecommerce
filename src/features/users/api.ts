@@ -58,7 +58,7 @@ export const fetchUsers = async (
         params.set('sortDir', sort.direction)
     }
 
-    const res = await fetchAllData(`/users?${params.toString()}`)
+    const res = await fetchAllData<UserListResponse>(`/users?${params.toString()}`)
     const result = userListSchema.safeParse(res.data)
 
     if (!result.success) {
@@ -90,7 +90,7 @@ export const useUsersQuery = (
 // ✅ GET USER BY ID
 // ------------------------
 export const fetchUser = async (id: number): Promise<User> => {
-    const res = await fetchSingleData(`/users/${id}`)
+    const res = await fetchSingleData<{ data: unknown }>(`/users/${id}`)
     const result = userSchema.safeParse(res.data)
 
     if (!result.success) {
@@ -119,7 +119,7 @@ export const useCreateUser = () => {
 
     return useMutation({
         mutationFn: async (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
-            const res = await createData('/users', data)
+            const res = await createData<{ data: User }>('/users', data)
             return res.data
         },
     onSuccess: () => {
@@ -141,7 +141,7 @@ export const useUpdateUser = () => {
     return useMutation({
         mutationFn: async (data: Partial<User> & { id: number }) => {
             const { id, ...payload } = data
-            const res = await editData(`/users/${id}`, payload)
+            const res = await editData<{ data: User }>(`/users/${id}`, payload)
             return res.data
         },
         onSuccess: (_data, variables) => {
@@ -179,11 +179,11 @@ export const useDeleteUser = () => {
 export const useExportUser = () => {
     return useMutation({
         mutationFn: async ({ id }: { id: number }) => {
-            const response = await exportData(`/user-report/${id}`)
+            const response = await exportData<ArrayBuffer>(`/user-report/${id}`)
             const currentDate = new Date().toISOString().replace(/:/g, '')
             const filename = `${id}ReportExports_${currentDate}.xlsx`
 
-            const blob = new Blob([response.data])
+            const blob = new Blob([response])
             const link = document.createElement('a')
             link.href = window.URL.createObjectURL(blob)
             link.download = filename

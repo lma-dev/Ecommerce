@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: yaungkyaml-fe
+    build: .
+    image: yaungkyaml/fe:latest
+    env_file: .env.local
+    ports:
+      - "3000:3000"
+    networks:
+      - yaungkyaml
+
+networks:
+  yaungkyaml:
+    external: true 
+    name: yaungkyaml

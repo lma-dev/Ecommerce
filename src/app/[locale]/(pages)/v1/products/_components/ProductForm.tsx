@@ -1,193 +1,180 @@
-"use client";
+'use client'
 
-import { useCreateProduct, useUpdateProduct } from "@/features/products/api";
-import { Input } from "@/components/ui/input";
+import { useCreateProduct, useUpdateProduct } from '@/features/products/api'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Controller, useForm } from "react-hook-form";
-import { useEffect, useMemo } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { createProductSchema } from "@/features/products/schemas/createProductSchema";
-import { updateProductSchema } from "@/features/products/schemas/updateProductSchema";
-import ToastAlert from "@/app/[locale]/_components/ui/toast-box";
-import { useLocale, useTranslations } from "next-intl";
-import { FormSubmitButton } from "@/app/[locale]/_components/ui/button";
-import CustomLink from "@/app/[locale]/_components/ui/custom-link";
-import {
-  productStatusOptions,
-  ProductStatusType,
-} from "@/features/products/constants/status";
-import { Textarea } from "@/components/ui/textarea";
-import { useCategoriesQuery } from "@/features/categories/api";
-import { resolveAssetUrl } from "@/libs/assets";
-import ProductImageUploader from "./ProductImageUploader";
-import { uploadImageToCloudinary } from "@/libs/cloudinary";
+} from '@/components/ui/select'
+import { Controller, useForm } from 'react-hook-form'
+import { useEffect, useMemo } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { createProductSchema } from '@/features/products/schemas/createProductSchema'
+import { updateProductSchema } from '@/features/products/schemas/updateProductSchema'
+import ToastAlert from '@/app/[locale]/_components/ui/toast-box'
+import { useLocale, useTranslations } from 'next-intl'
+import { FormSubmitButton } from '@/app/[locale]/_components/ui/button'
+import CustomLink from '@/app/[locale]/_components/ui/custom-link'
+import { productStatusOptions, ProductStatusType } from '@/features/products/constants/status'
+import { Textarea } from '@/components/ui/textarea'
+import { useCategoriesQuery } from '@/features/categories/api'
+import { resolveAssetUrl } from '@/libs/assets'
+import ProductImageUploader from './ProductImageUploader'
+import { uploadImageToCloudinary } from '@/libs/cloudinary'
 
 // --- Shared ProductForm Component ---
-const ProductForm = ({
-  mode,
-  defaultValues,
-}: {
-  mode: "create" | "edit";
-  defaultValues?: any;
-}) => {
-  type CreateValues = z.infer<typeof createProductSchema>;
-  type UpdateValues = z.infer<typeof updateProductSchema>;
+const ProductForm = ({ mode, defaultValues }: { mode: 'create' | 'edit'; defaultValues?: any }) => {
+  type UpdateValues = z.infer<typeof updateProductSchema>
   // Use the update (partial) shape for the form type to avoid resolver mismatch
-  type FormValues = UpdateValues;
+  type FormValues = UpdateValues
   // Normalize incoming defaults (esp. categoryId from category.id)
   const mappedDefaults = defaultValues
     ? {
-        name: defaultValues.name ?? "",
-        description: defaultValues.description ?? "",
-        isActive: defaultValues.isActive ?? "ACTIVE",
+        name: defaultValues.name ?? '',
+        description: defaultValues.description ?? '',
+        isActive: defaultValues.isActive ?? 'ACTIVE',
         price: defaultValues.price ?? 0,
-        categoryId:
-          defaultValues.categoryId ?? defaultValues.category?.id ?? null,
+        categoryId: defaultValues.categoryId ?? defaultValues.category?.id ?? null,
         image: null,
       }
     : {
-        name: "",
-        description: "",
-        isActive: "ACTIVE",
+        name: '',
+        description: '',
+        isActive: 'ACTIVE',
         price: 0,
         categoryId: null,
         image: null,
-      };
+      }
 
-  const activeSchema =
-    mode === "edit" ? updateProductSchema : createProductSchema;
+  const activeSchema = mode === 'edit' ? updateProductSchema : createProductSchema
   const form = useForm<FormValues>({
     resolver: zodResolver(activeSchema) as any,
     defaultValues: mappedDefaults as any,
-  });
+  })
 
   // Ensure categoryId is set from defaultValues on mount (robust preselect)
   useEffect(() => {
-    if (mode === "edit") {
-      const id = defaultValues?.categoryId ?? defaultValues?.category?.id;
+    if (mode === 'edit') {
+      const id = defaultValues?.categoryId ?? defaultValues?.category?.id
       if (id != null) {
-        form.setValue("categoryId" as any, id, { shouldDirty: false });
+        form.setValue('categoryId' as any, id, { shouldDirty: false })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const existingImageUrl = useMemo(() => {
-    const rawImage = defaultValues?.image;
-    if (rawImage && typeof rawImage === "object" && "url" in rawImage) {
-      const url = (rawImage as { url?: string | null }).url;
+    const rawImage = defaultValues?.image
+    if (rawImage && typeof rawImage === 'object' && 'url' in rawImage) {
+      const url = (rawImage as { url?: string | null }).url
       if (url) {
-        return resolveAssetUrl(url) ?? url;
+        return resolveAssetUrl(url) ?? url
       }
     }
 
     if (defaultValues?.imageUrl) {
-      return resolveAssetUrl(defaultValues.imageUrl) ?? defaultValues.imageUrl;
+      return resolveAssetUrl(defaultValues.imageUrl) ?? defaultValues.imageUrl
     }
 
-    return undefined;
-  }, [defaultValues]);
-  const locale = useLocale();
-  const t = useTranslations("Translation");
+    return undefined
+  }, [defaultValues])
+  const locale = useLocale()
+  const t = useTranslations('Translation')
 
-  const create = useCreateProduct();
-  const update = useUpdateProduct();
-  const { data: categoriesRes, isLoading: isLoadingCategories } =
-    useCategoriesQuery(1, {});
-  const isProcessing =
-    create.isPending || update.isPending || form.formState.isSubmitting;
+  const create = useCreateProduct()
+  const update = useUpdateProduct()
+  const { data: categoriesRes, isLoading: isLoadingCategories } = useCategoriesQuery(1, {})
+  const isProcessing = create.isPending || update.isPending || form.formState.isSubmitting
 
   const onSubmit = async (values: FormValues) => {
-    let imagePayload:
-      | Awaited<ReturnType<typeof uploadImageToCloudinary>>
-      | undefined;
+    let imagePayload: Awaited<ReturnType<typeof uploadImageToCloudinary>> | undefined
 
     if (values.image instanceof File) {
       try {
-        imagePayload = await uploadImageToCloudinary(values.image);
+        imagePayload = await uploadImageToCloudinary(values.image)
       } catch (error) {
         const message =
-          error instanceof Error
-            ? error.message
-            : "Unable to upload image. Please try again.";
-        ToastAlert.error({ message });
-        return;
+          error instanceof Error ? error.message : 'Unable to upload image. Please try again.'
+        ToastAlert.error({ message })
+        return
       }
     }
 
-    const basePayload = {
-      name: values.name,
-      description: values.description ?? null,
-      isActive: values.isActive,
-      price: Number(values.price),
-      categoryId: values.categoryId as number,
-    };
-
-    if (mode === "edit" && defaultValues?.id) {
+    if (mode === 'edit' && defaultValues?.id) {
       try {
+        const updatePayload = {
+          ...(values.name != null ? { name: values.name } : {}),
+          ...(values.description !== undefined ? { description: values.description ?? null } : {}),
+          ...(values.isActive != null ? { isActive: values.isActive } : {}),
+          ...(values.price != null ? { price: Number(values.price) } : {}),
+          ...(values.categoryId != null ? { categoryId: values.categoryId as number } : {}),
+          ...(imagePayload ? { image: imagePayload } : {}),
+        }
         await update.mutateAsync({
           id: defaultValues.id,
-          ...basePayload,
-          ...(imagePayload ? { image: imagePayload } : {}),
-        });
-        ToastAlert.success({ message: t("updateSuccess") });
+          ...updatePayload,
+        })
+        ToastAlert.success({ message: t('updateSuccess') })
       } catch (_error) {
-        // handled by mutation onError
+        console.error(_error)
       }
     } else {
+      if (!values.name) {
+        ToastAlert.error({ message: 'Name is required' })
+        return
+      }
+      if (values.categoryId == null) {
+        ToastAlert.error({ message: 'Please select a category' })
+        return
+      }
       try {
         await create.mutateAsync({
-          ...basePayload,
+          name: values.name,
+          description: values.description ?? null,
+          isActive: values.isActive ?? 'ACTIVE',
+          price: Number(values.price),
+          categoryId: values.categoryId as number,
           image: imagePayload ?? null,
-        });
-        form.setValue("image" as any, null, { shouldDirty: false });
-        ToastAlert.success({ message: t("createSuccess") });
+        })
+        form.setValue('image' as any, null, { shouldDirty: false })
+        ToastAlert.success({ message: t('createSuccess') })
       } catch (_error) {
-        // handled by mutation onError
+        console.error(_error)
       }
     }
-  };
+  }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Input {...form.register("name")} placeholder={t("name")} />
+      <Input {...form.register('name')} placeholder={t('name')} />
       <Input
-        {...form.register("price", { valueAsNumber: true })}
-        placeholder={t("price")}
+        {...form.register('price', { valueAsNumber: true })}
+        placeholder={t('price')}
         type="number"
       />
-      <Textarea
-        {...form.register("description")}
-        placeholder={t("description")}
-      />
+      <Textarea {...form.register('description')} placeholder={t('description')} />
 
       {/* Category Select (shows name, submits id) */}
       <Controller
         name="categoryId"
         control={form.control}
         render={({ field }) => {
-          if (isLoadingCategories) return <div>{t("loadingCategories")}</div>;
+          if (isLoadingCategories) return <div>{t('loadingCategories')}</div>
 
-          const categories = categoriesRes?.data ?? [];
-          const selectedId = field.value as number | null | undefined;
-          const hasSelected =
-            selectedId != null && categories.some((c) => c.id === selectedId);
+          const categories = categoriesRes?.data ?? []
+          const selectedId = field.value as number | null | undefined
+          const hasSelected = selectedId != null && categories.some((c) => c.id === selectedId)
           const fallbackOption =
             !hasSelected && selectedId != null
               ? {
                   id: selectedId,
-                  name:
-                    defaultValues?.category?.name ??
-                    `Current category (#${selectedId})`,
+                  name: defaultValues?.category?.name ?? `Current category (#${selectedId})`,
                 }
-              : null;
+              : null
 
           return (
             <Select
@@ -195,7 +182,7 @@ const ProductForm = ({
               onValueChange={(v) => field.onChange(Number(v))}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("selectCategory")} />
+                <SelectValue placeholder={t('selectCategory')} />
               </SelectTrigger>
               <SelectContent>
                 {fallbackOption && (
@@ -215,7 +202,7 @@ const ProductForm = ({
                   ))}
               </SelectContent>
             </Select>
-          );
+          )
         }}
       />
       <Controller
@@ -241,12 +228,12 @@ const ProductForm = ({
             onValueChange={(v) => field.onChange(v as ProductStatusType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder={t("selectStatus")} />
+              <SelectValue placeholder={t('selectStatus')} />
             </SelectTrigger>
             <SelectContent>
               {productStatusOptions.map((st) => (
                 <SelectItem key={st} value={st}>
-                  {st === "ACTIVE" ? t("active") : t("inactive")}
+                  {st === 'ACTIVE' ? t('active') : t('inactive')}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -254,18 +241,16 @@ const ProductForm = ({
         )}
       />
       <div className="flex justify-between items-center">
-        <CustomLink
-          href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/products`}
-        >
-          {t("back")}
+        <CustomLink href={`/${locale}/${process.env.NEXT_PUBLIC_APP_VERSION}/products`}>
+          {t('back')}
         </CustomLink>
         <FormSubmitButton
-          text={mode === "edit" ? t("updateProduct") : t("createProduct")}
+          text={mode === 'edit' ? t('updateProduct') : t('createProduct')}
           disabled={isProcessing}
         />
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default ProductForm;
+export default ProductForm

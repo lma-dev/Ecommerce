@@ -22,7 +22,6 @@ export async function callCustomerApi<T = any>({
   return res.data
 }
 
-export async function fetchCustomerList(url: string, params?: any) {
-  return await callCustomerApi({ method: 'GET', url, params })
+export async function fetchCustomerList<T = any>(url: string, params?: any): Promise<T> {
+  return await callCustomerApi<T>({ method: 'GET', url, params })
 }
-

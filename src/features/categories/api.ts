@@ -43,7 +43,7 @@ export const fetchCategories = async (
         params.set('isActive', filters.isActive)
     }
 
-    const res = await fetchAllData(`/categories?${params.toString()}`)
+    const res = await fetchAllData<CategoryListResponse>(`/categories?${params.toString()}`)
     const result = categoryListSchema.safeParse(res.data)
 
     if (!result.success) {
@@ -74,7 +74,7 @@ export const useCategoriesQuery = (
 // ✅ GET CATEGORY BY ID
 // ------------------------
 export const fetchCategory = async (id: number): Promise<Category> => {
-    const res = await fetchSingleData(`/categories/${id}`)
+    const res = await fetchSingleData<{ data: unknown }>(`/categories/${id}`)
     const result = categorySchema.safeParse(res.data)
 
     if (!result.success) {
@@ -103,7 +103,7 @@ export const useCreateCategory = () => {
 
     return useMutation({
         mutationFn: async (data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
-            const res = await createData('/categories', data)
+            const res = await createData<{ data: Category }>('/categories', data)
             return res.data
         },
         onSuccess: () => {
@@ -125,7 +125,7 @@ export const useUpdateCategory = () => {
     return useMutation({
         mutationFn: async (data: Partial<Category> & { id: number }) => {
             const { id, ...payload } = data
-            const res = await editData(`/categories/${id}`, payload)
+            const res = await editData<{ data: Category }>(`/categories/${id}`, payload)
             return res.data
         },
         onSuccess: (_data, variables) => {

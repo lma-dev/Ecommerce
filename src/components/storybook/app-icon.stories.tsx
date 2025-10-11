@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
 import { AppIcon } from "@/app/[locale]/_components/ui/app-icon";
 import { Bell } from "lucide-react";
 

@@ -12,15 +12,13 @@ interface CallApiParams<TBody = unknown> {
   responseType?: ResponseType;
 }
 
-async function getAuthHeaders() {
+async function getAuthHeaders(): Promise<Record<string, string>> {
   const session = await getSession();
   const token = session?.user.token;
 
-  return token
-    ? {
-        Authorization: `Bearer ${token}`,
-      }
-    : {};
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 function handleSuccess<T>(response: { data: T }) {

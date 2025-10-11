@@ -1,5 +1,4 @@
-import Axios from 'axios'
-import type { InternalAxiosRequestConfig } from 'axios'
+import Axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
 import { ensureSanctumCookie, getXsrfToken } from "@/libs/sanctum"
 
 const apiConfig = {
@@ -17,7 +16,9 @@ const axios = Axios.create(apiConfig)
 
 axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     const method = (config.method || 'get').toUpperCase()
-    const headers = { ...(config.headers || {}) } as Record<string, string>
+    const headers = config.headers instanceof AxiosHeaders
+        ? config.headers
+        : new AxiosHeaders(config.headers ?? {})
     const needsCsrf = method !== 'GET' && config.withCredentials !== false
 
     if (needsCsrf) {
@@ -26,8 +27,8 @@ axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
             await ensureSanctumCookie(true)
             xsrf = getXsrfToken()
         }
-        if (xsrf) headers['X-XSRF-TOKEN'] = xsrf
-    }
+        if (xsrf) headers.set('X-XSRF-TOKEN', xsrf)
+}
 
     config.headers = headers
     return config

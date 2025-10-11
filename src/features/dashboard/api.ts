@@ -13,14 +13,16 @@ export const dashboardStatsSchema = z.object({
 export type DashboardStats = z.infer<typeof dashboardStatsSchema>
 
 export const fetchDashboardStats = async (): Promise<DashboardStats> => {
-  // Endpoint assumed to return { data: { ...stats } }
-  const res = await fetchSingleData(`/dashboard`)
+  const res = (await fetchSingleData('/dashboard')) as any
   const parsed = dashboardStatsSchema.safeParse(res.data)
   if (!parsed.success) {
     // Some backends wrap under data; try res.data?.data
     const fallback = dashboardStatsSchema.safeParse(res.data?.data)
     if (!fallback.success) {
-      console.error('Invalid dashboard stats:', fallback.error?.format?.() ?? parsed.error?.format?.())
+      console.error(
+        'Invalid dashboard stats:',
+        fallback.error?.format?.() ?? parsed.error?.format?.(),
+      )
       throw new Error('Invalid dashboard stats format')
     }
     return fallback.data
@@ -36,4 +38,3 @@ export const useDashboardStats = () =>
     refetchIntervalInBackground: true,
     staleTime: 30_000,
   })
-

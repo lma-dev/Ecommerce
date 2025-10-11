@@ -48,7 +48,7 @@ export const fetchProducts = async (
         params.set('isActive', filters.isActive)
     }
 
-    const res = await fetchAllData(`/products?${params.toString()}`)
+    const res = await fetchAllData<ProductListResponse>(`/products?${params.toString()}`)
     const result = productListSchema.safeParse(res.data)
 
     if (!result.success) {
@@ -79,7 +79,7 @@ export const useProductsQuery = (
 // ✅ GET CATEGORY BY ID
 // ------------------------
 export const fetchProduct = async (id: number): Promise<Product> => {
-    const res = await fetchSingleData(`/products/${id}`)
+    const res = await fetchSingleData<{ data: unknown }>(`/products/${id}`)
     const result = productSchema.safeParse(res.data)
 
     if (!result.success) {
@@ -117,7 +117,7 @@ export const useCreateProduct = () => {
                 image: data.image ?? null,
             })
 
-            const res = await createData('/products', body)
+            const res = await createData<{ data: Product }>('/products', body)
             return res.data
         },
         onSuccess: () => {
@@ -148,7 +148,7 @@ export const useUpdateProduct = () => {
                 image: payload.image,
             })
 
-            return await editData(`/products/${id}`, body);
+            return await editData<{ data: Product }>(`/products/${id}`, body);
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["products"] });

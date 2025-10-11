@@ -17,7 +17,6 @@ export default function ProductCard({ product }: Props) {
   return (
     <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden transition shadow-sm hover:shadow-md">
       <div className="w-full h-36 sm:h-40 bg-amber-50 flex items-center justify-center p-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl}
           alt={product.name}

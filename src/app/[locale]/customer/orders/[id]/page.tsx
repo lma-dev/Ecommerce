@@ -77,7 +77,6 @@ export default function CustomerOrderDetailPage() {
                   key={p.id}
                   className="flex gap-3 items-center border rounded-xl p-3 bg-neutral-50"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={
                       resolveAssetUrl(p.image?.url || p.imageUrl) ||

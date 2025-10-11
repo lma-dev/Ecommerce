@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { createOrderSchema } from './createOrderSchema'
 import { orderStatusOptions } from '../constants/status'
 
 const orderCustomerSchema = z.object({
@@ -40,8 +39,10 @@ export const orderSchema = z.object({
   status: z.enum(orderStatusOptions),
   notes: z.string().nullable().optional(),
   totalAmount: z.number(),
+  total: z.number().optional(),
   shippingAddress: z.string().nullable().optional(),
   createdAt: z.string(),
+  created_at: z.string().optional(),
   updatedAt: z.string(),
   products: z.array(orderProductSchema),
 })
