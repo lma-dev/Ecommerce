@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\UserRoleType;
+
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -35,15 +36,51 @@ class ProductsTest extends TestCase
         $this->actingAsAdmin();
         $category = Category::factory()->create();
         $payload = [
-            'name' => 'Tea Leaves',
-            'price' => 12.50,
-            'categoryId' => $category->id,
-            'isActive' => 'ACTIVE',
+            'name'        => 'Tea Leaves',
+            'price'       => 1250,
+            'categoryId'  => $category->id,
+            'isActive'    => 'ACTIVE',
             'description' => 'Premium Myanmar tea leaves',
+            'image'       => [
+                'public_id' => 'ecommerce/test_public_id',
+                'url'       => 'https://res.cloudinary.com/demo/image/upload/v1234567890/sample.jpg',
+                'format'    => 'jpg',
+                'width'     => 800,
+                'height'    => 600,
+                'bytes'     => 123456,
+            ],
         ];
         $res = $this->postJson('/api/staff/products', $payload);
         $res->assertCreated();
         $this->assertDatabaseHas('products', ['name' => 'Tea Leaves']);
+    }
+
+    public function test_store_product_rejects_suspended_user(): void
+    {
+        $user = User::factory()->create([
+            'role' => UserRoleType::ADMIN->value,
+            'account_status' => 'SUSPENDED',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $category = Category::factory()->create();
+        $payload = [
+            'name'        => 'Blocked Product',
+            'price'       => 500,
+            'categoryId'  => $category->id,
+            'isActive'    => 'ACTIVE',
+            'image'       => [
+                'public_id' => 'ecommerce/blocked',
+                'url'       => 'https://res.cloudinary.com/demo/image/upload/v1234567890/blocked.jpg',
+                'format'    => 'jpg',
+                'width'     => 640,
+                'height'    => 480,
+                'bytes'     => 654321,
+            ],
+        ];
+
+        $this->postJson('/api/staff/products', $payload)->assertForbidden();
     }
 
     public function test_index_products_handles_large_dataset(): void
@@ -52,8 +89,8 @@ class ProductsTest extends TestCase
 
         Product::factory()
             ->count(120)
-            ->sequence(fn (Sequence $sequence) => [
-                'name' => 'Bulk Product '.($sequence->index + 1),
+            ->sequence(fn(Sequence $sequence) => [
+                'name' => 'Bulk Product ' . ($sequence->index + 1),
             ])
             ->create();
 

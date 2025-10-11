@@ -25,7 +25,6 @@ class FetchCategoryRequest extends FormRequest
             'limit' => ['nullable', 'integer'],
             'page' => ['nullable', 'integer'],
             'name' => ['nullable', 'string'],
-            "isActive" => ['nullable', 'string'],
         ];
     }
 }

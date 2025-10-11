@@ -16,9 +16,7 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $imageUrl = optional($this->whenLoaded('image'))?->url
-            ?? optional($this->image)->url
-            ?? 'https://via.placeholder.com/800x800.png?text=Product';
+
         return [
             'id'                => $this->id,
             'name'              => $this->name,
@@ -32,7 +30,6 @@ class ProductResource extends JsonResource
                 $this->whenLoaded('category')
             ),
             // For frontend convenience during testing
-            'imageUrl' => $imageUrl,
             "image" => new ProductImageResource($this->whenLoaded('image'))
         ];
     }

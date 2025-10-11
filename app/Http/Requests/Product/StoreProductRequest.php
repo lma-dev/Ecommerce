@@ -28,8 +28,15 @@ class StoreProductRequest extends FormRequest
             'price'       => 'required|numeric|min:0',
             'categoryId' => 'required|integer|exists:categories,id',
             'isActive'    => ['sometimes', 'string', Rule::in(VisibilityStatusType::getAllStatuses())],
-            'image'       => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'sometimes|string|max:1000',
+
+            #Cloudinary image upload fields
+            'image.public_id' => 'required|string',
+            'image.url' => 'required|url',
+            'image.format' => 'required|string|max:16',
+            'image.width' => 'required|integer',
+            'image.height' => 'required|integer',
+            'image.bytes' => 'required|integer',
         ];
     }
 }

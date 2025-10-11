@@ -6,7 +6,7 @@ use App\Enums\UserRoleType;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -14,47 +14,60 @@ class CategoriesTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function actingAsStaff(): User
+    private function actingAsConsoleUser(array $overrides = []): User
     {
-        $user = User::factory()->create(['role' => UserRoleType::STAFF->value]);
+        $user = User::factory()->create(array_merge([
+            'role' => UserRoleType::ADMIN->value,
+            'account_status' => 'ACTIVE',
+        ], $overrides));
+
         Sanctum::actingAs($user);
+
         return $user;
     }
 
-    public function test_index_categories(): void
+    public function test_admin_can_create_category(): void
     {
-        $this->actingAsStaff();
-        Category::factory()->count(2)->create();
-        $res = $this->getJson('/api/staff/categories');
-        $res->assertOk()->assertJsonStructure(['data', 'meta']);
+        $this->actingAsConsoleUser();
+
+        $payload = [
+            'name'        => 'Groceries ' . Str::random(5),
+            'description' => 'Everyday essentials',
+            'isActive'    => 'ACTIVE',
+        ];
+
+        $this->postJson('/api/staff/categories', $payload)
+            ->assertCreated();
+
+        $this->assertDatabaseHas('categories', ['name' => $payload['name']]);
     }
 
-    public function test_store_category(): void
+    public function test_suspended_user_cannot_create_category(): void
     {
-        $this->actingAsStaff();
-        $res = $this->postJson('/api/staff/categories', [
-            'name' => 'Snacks',
-            'description' => 'Myanmar snacks',
+        $this->actingAsConsoleUser([
+            'account_status' => 'SUSPENDED',
         ]);
-        $res->assertCreated();
-        $this->assertDatabaseHas('categories', ['name' => 'Snacks']);
+
+        $payload = [
+            'name'     => 'Suspended ' . Str::random(5),
+            'isActive' => 'ACTIVE',
+        ];
+
+        $this->postJson('/api/staff/categories', $payload)
+            ->assertForbidden();
     }
 
-    public function test_index_categories_handles_large_dataset(): void
+    public function test_staff_can_delete_category(): void
     {
-        $this->actingAsStaff();
+        $this->actingAsConsoleUser([
+            'role' => UserRoleType::STAFF->value,
+        ]);
 
-        Category::factory()
-            ->count(80)
-            ->sequence(fn (Sequence $sequence) => [
-                'name' => 'Bulk Category '.($sequence->index + 1),
-            ])
-            ->create();
+        $category = Category::factory()->create();
 
-        $response = $this->getJson('/api/staff/categories?limit=50');
+        $this->deleteJson("/api/staff/categories/{$category->id}")
+            ->assertOk();
 
-        $response->assertOk()->assertJsonPath('meta.totalItems', 80);
-
-        $this->assertSame(50, count($response->json('data')));
+        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
     }
 }

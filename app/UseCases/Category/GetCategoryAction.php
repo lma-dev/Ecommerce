@@ -2,6 +2,8 @@
 
 namespace App\UseCases\Category;
 
+use App\Enums\AppModeType;
+use App\Enums\VisibilityStatusType;
 use App\Helpers\ResponseHelper;
 use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
@@ -10,10 +12,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class GetCategoryAction
 {
-    public function __invoke(array $data): JsonResponse
+    public function __invoke(array $data, string $mode = AppModeType::CUSTOMER_MODE->value): JsonResponse
     {
-
-        $data = $this->CategoryFilter($data);
+        $isActive = $mode === AppModeType::CUSTOMER_MODE->value ?
+            VisibilityStatusType::ACTIVE->value   : null;
+        $data = $this->CategoryFilter($data, $isActive);
         $meta = ResponseHelper::getPaginationMeta($data);
 
         return response()->json([
@@ -22,12 +25,11 @@ class GetCategoryAction
         ]);
     }
 
-    private function CategoryFilter(array $validatedData): LengthAwarePaginator
+    private function CategoryFilter(array $validatedData,  ?string $isActive): LengthAwarePaginator
     {
         $limit       = (int) ($validatedData['limit'] ?? 8);
         $page        = (int) ($validatedData['page'] ?? 1);
         $name        = $validatedData['name'] ?? null;
-        $isActive      = $validatedData['isActive'] ?? null;
 
         return Category::query()
             ->when(
@@ -35,8 +37,8 @@ class GetCategoryAction
                 fn($q, $n) =>
                 $q->where('name', 'like', "%{$n}%")
             )
-            ->when($isActive, fn($q, $r) => $q->where('is_active', $r))
 
+            ->when($isActive !== null, fn($q) => $q->where('is_active', $isActive))
             ->latest('created_at')
             ->paginate($limit, ['*'], 'page', $page)
             ->withQueryString();

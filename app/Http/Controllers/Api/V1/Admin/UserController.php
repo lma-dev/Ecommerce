@@ -67,7 +67,7 @@ class UserController extends Controller
 
         return ResponseHelper::success(
             "User deleted successfully",
-            new UserResource($data)
+            null
         );
     }
 }
