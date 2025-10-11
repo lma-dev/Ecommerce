@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+node_modules
+vendor
+storage/logs
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public
+storage/debugbar
+.idea
+.vscode
+*.log
+docker-compose.override.yml

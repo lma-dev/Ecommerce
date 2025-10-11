@@ -21,6 +21,19 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Local Development with Docker
+
+This project ships with a Docker environment for PHP-FPM, Nginx, and MySQL.
+
+1. Copy `.env.example` to `.env` and adjust any values you need. Ensure `MYSQL_ROOT_PASSWORD` matches the MySQL credentials the app will use.
+2. Build the containers: `docker compose build`.
+3. Install dependencies: `docker compose run --rm app composer install`.
+4. Generate the application key: `docker compose run --rm app php artisan key:generate`.
+5. Start the stack: `docker compose up -d`.
+6. Run database migrations: `docker compose exec app php artisan migrate`.
+
+The API will be available at `http://localhost:8000`. A queue worker is automatically provisioned (`queue` service). To tail logs or run ad-hoc commands use `docker compose exec app <command>`.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
