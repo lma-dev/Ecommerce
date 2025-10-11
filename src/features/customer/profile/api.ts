@@ -14,8 +14,7 @@ export const useCustomerProfile = () =>
   useQuery({
     queryKey: ['customer','me'],
     queryFn: async (): Promise<CustomerProfile> => {
-      const res = await callCustomerApi({ method: 'GET', url: '/customer/me' })
-      return (res as any).data ?? res
+      return await callCustomerApi<CustomerProfile>({ method: 'GET', url: '/customer/me' })
     },
     staleTime: 60_000,
     refetchInterval: 60_000,
@@ -26,8 +25,7 @@ export const useUpdateCustomerProfile = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (payload: Partial<CustomerProfile>) => {
-      const res = await callCustomerApi({ method: 'PATCH', url: '/customer/me', data: payload })
-      return (res as any).data ?? res
+      return await callCustomerApi<CustomerProfile>({ method: 'PATCH', url: '/customer/me', data: payload })
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['customer','me'] })
@@ -38,8 +36,7 @@ export const useUpdateCustomerProfile = () => {
 export const useDeleteCustomerProfile = () => {
   return useMutation({
     mutationFn: async () => {
-      const res = await callCustomerApi({ method: 'DELETE', url: '/customer/me' })
-      return (res as any).data ?? res
+      return await callCustomerApi<{ success: boolean }>({ method: 'DELETE', url: '/customer/me' })
     },
   })
 }

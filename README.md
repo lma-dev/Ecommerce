@@ -86,6 +86,23 @@ pnpm dev
 
 ---
 
+## 🐳 Docker
+
+```bash
+# 1. Create your environment file (optional but recommended)
+cp .env.example .env.local
+
+# 2. Build the production image
+docker build -t yaung-kya-ml .
+
+# 3. Run the container with your env vars and expose port 3000
+docker run --env-file .env.local -p 3000:3000 htain-thein-fe
+```
+
+The container runs `pnpm start`, so it serves the pre-built app on port `3000`.
+
+---
+
 ## 🔐 Auth & Middleware
 
 * **Next Auth**: Manages sessions, tokens, and user states.

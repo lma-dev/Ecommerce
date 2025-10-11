@@ -5,8 +5,8 @@ export const useCustomerCategories = () =>
   useQuery({
     queryKey: ['customer','categories'],
     queryFn: async () => {
-      const res = await fetchCustomerList('/customer/categories')
-      return (res as any).data ?? res
+      const res = await fetchCustomerList<{ data?: unknown }>('/customer/categories')
+      return res.data ?? res
     },
     staleTime: 60_000,
     refetchInterval: 60_000,
@@ -22,8 +22,8 @@ export const useCustomerProducts = (filters?: { categoryId?: number; search?: st
       // backend expects `name` for search term
       if (filters?.search) params.set('name', filters.search)
       const qs = params.toString()
-      const res = await fetchCustomerList(`/customer/products${qs ? `?${qs}` : ''}`)
-      return (res as any).data ?? res
+      const res = await fetchCustomerList<{ data?: unknown }>(`/customer/products${qs ? `?${qs}` : ''}`)
+      return res.data ?? res
     },
     staleTime: 30_000,
     enabled: Boolean(filters?.categoryId),

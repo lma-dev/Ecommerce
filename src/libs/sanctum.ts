@@ -46,6 +46,7 @@ export const ensureSanctumCookie = async (force = false) => {
       "X-Requested-With": "XMLHttpRequest",
     },
   })
+    .then(() => undefined)
     .catch((error) => {
       if (debugEnabled) console.warn("[Sanctum] CSRF cookie fetch failed", error);
       throw error;

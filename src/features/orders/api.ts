@@ -36,7 +36,7 @@ export const fetchOrders = async (
   if (filters.status) params.set('status', filters.status)
   if (filters.customerName) params.set('customerName', filters.customerName)
 
-  const res = await fetchAllData(`/orders?${params.toString()}`)
+  const res = await fetchAllData<OrderListResponse>(`/orders?${params.toString()}`)
   const result = orderListSchema.safeParse(res.data)
 
   if (!result.success) {
@@ -65,7 +65,7 @@ export const useOrdersQuery = (
 
 // GET by ID
 export const fetchOrder = async (id: number): Promise<Order> => {
-  const res = await fetchSingleData(`/orders/${id}`)
+  const res = await fetchSingleData<{ data: unknown }>(`/orders/${id}`)
   const result = orderSchema.safeParse(res.data)
 
   if (!result.success) {
@@ -93,7 +93,7 @@ export const useCreateOrder = () => {
   return useMutation({
     mutationFn: async (data: any) => {
       // Orders are JSON payloads by default
-      const res = await createData('/orders', data)
+      const res = await createData<{ data: Order }>('/orders', data)
       return res.data
     },
     onSuccess: () => {
@@ -113,7 +113,7 @@ export const useUpdateOrder = () => {
   return useMutation({
     mutationFn: async (data: any & { id: number }) => {
       const { id, ...payload } = data
-      const res = await editData(`/orders/${id}`, payload)
+      const res = await editData<{ data: Order }>(`/orders/${id}`, payload)
       return res.data
     },
     onSuccess: (_data, variables) => {

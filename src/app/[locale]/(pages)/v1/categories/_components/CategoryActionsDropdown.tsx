@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   DropdownMenu,
@@ -7,31 +7,30 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, MoreVertical } from "lucide-react";
-import { useCategoryActionHandlers } from "@/features/categories/hooks/useCategoryActionHandlers";
-import type { Category } from "@/features/categories/types";
-import { useTranslations, useLocale } from "next-intl";
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { Pencil, Trash2, MoreVertical } from 'lucide-react'
+import { useCategoryActionHandlers } from '@/features/categories/hooks/useCategoryActionHandlers'
+import type { Category } from '@/features/categories/types'
+import { useTranslations } from 'next-intl'
 
-type DialogType = "delete" | null;
+type DialogType = 'delete' | null
 
 interface CategoryActionDropdownProps {
-  category: Category;
-  showDialog: (type: DialogType, method: () => void) => void;
+  category: Category
+  showDialog: (type: DialogType, method: () => void) => void
 }
 
 export const CategoryActionDropdown: React.FC<CategoryActionDropdownProps> = ({
   category,
   showDialog,
 }) => {
-  const locale = useLocale();
-  const { onEdit, onDelete } = useCategoryActionHandlers(category);
-  const t = useTranslations("Translation");
+  const { onEdit, onDelete } = useCategoryActionHandlers(category)
+  const t = useTranslations('Translation')
 
   const handleDeleteClick = () => {
-    showDialog("delete", onDelete);
-  };
+    showDialog('delete', onDelete)
+  }
 
   return (
     <DropdownMenu>
@@ -42,7 +41,7 @@ export const CategoryActionDropdown: React.FC<CategoryActionDropdownProps> = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>{t("setting")}</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('setting')}</DropdownMenuLabel>
 
         {/* {(role === "ADMIN" || role === "SUPER_ADMIN") && ( */}
         <>
@@ -50,22 +49,22 @@ export const CategoryActionDropdown: React.FC<CategoryActionDropdownProps> = ({
 
           <DropdownMenuItem onSelect={onEdit}>
             <Pencil className="mr-2 h-4 w-4" />
-            {t("edit")}
+            {t('edit')}
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          <DropdownMenuLabel>{t("dangerZone")}</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('dangerZone')}</DropdownMenuLabel>
 
           <DropdownMenuItem
             onSelect={handleDeleteClick}
             className="text-red-500 focus:text-red-500"
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            {t("delete")}
+            {t('delete')}
           </DropdownMenuItem>
         </>
         {/* )} */}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-};
+  )
+}

@@ -43,7 +43,7 @@ export const fetchCustomers = async (
     if (filters.email) params.set('email', filters.email)
   }
 
-  const res = await fetchAllData(`/customers?${params.toString()}`)
+  const res = await fetchAllData<CustomerListResponse>(`/customers?${params.toString()}`)
   const result = customerListSchema.safeParse(res.data)
 
   if (!result.success) {
@@ -72,7 +72,7 @@ export const useCustomersQuery = (
 
 // GET by ID
 export const fetchCustomer = async (id: number): Promise<Customer> => {
-  const res = await fetchSingleData(`/customers/${id}`)
+  const res = await fetchSingleData<{ data: unknown }>(`/customers/${id}`)
   const result = customerSchema.safeParse(res.data)
 
   if (!result.success) {
@@ -99,7 +99,7 @@ export const useCreateCustomer = () => {
 
   return useMutation({
     mutationFn: async (data: Omit<Customer, 'id' | 'createdAt'>) => {
-      const res = await createData('/customers', data)
+      const res = await createData<{ data: Customer }>('/customers', data)
       return res.data
     },
     onSuccess: () => {
@@ -119,7 +119,7 @@ export const useUpdateCustomer = () => {
   return useMutation({
     mutationFn: async (data: Partial<Customer> & { id: number }) => {
       const { id, ...payload } = data
-      const res = await editData(`/customers/${id}`, payload)
+      const res = await editData<{ data: Customer }>(`/customers/${id}`, payload)
       return res.data
     },
     onSuccess: (_data, variables) => {

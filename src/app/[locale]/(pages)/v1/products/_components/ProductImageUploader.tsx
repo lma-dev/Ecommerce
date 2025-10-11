@@ -52,7 +52,6 @@ export default function ProductImageUploader({
     <div className="space-y-2">
       {previewUrl && (
         <div className="w-40 h-40 overflow-hidden rounded border border-dashed border-neutral-300 flex items-center justify-center bg-neutral-50">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl}
             alt="Product preview"

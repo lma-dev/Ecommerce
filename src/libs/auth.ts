@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
                 const data = await res.json()
 
                 if (res.ok && data.user) {
-                    return {
+                    const authorizedUser = {
                         id: data.user.id,
                         name: data.user.name,
                         email: data.user.email,
@@ -32,6 +32,8 @@ export const authOptions: NextAuthOptions = {
                         accountStatus: data.user.accountStatus,
                         token: data.token // if your backend returns token
                     }
+
+                    return authorizedUser
                 }
 
                 return null

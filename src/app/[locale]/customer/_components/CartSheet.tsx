@@ -50,7 +50,6 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
             ) : (
               items.map((item) => (
                 <div key={item.id} className="flex gap-3 items-center border border-neutral-200 rounded-xl p-3 bg-neutral-50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={resolveAssetUrl(item.imageUrl) || "https://via.placeholder.com/160x160.png?text=Product"}
                     alt={item.name}
