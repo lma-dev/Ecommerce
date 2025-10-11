@@ -18,7 +18,19 @@ const orderProductSchema = z.object({
   isActive: z.string(),
   quantity: z.number(),
   imageUrl: z.string().url().optional(),
-  image: z.object({ id: z.number().optional(), url: z.string().url() }).optional(),
+  image: z
+    .union([
+      z.object({ id: z.number().optional(), url: z.string().url() }),
+      z.object({
+        public_id: z.string(),
+        url: z.string().url(),
+        format: z.string(),
+        width: z.number(),
+        height: z.number(),
+        bytes: z.number(),
+      }),
+    ])
+    .optional(),
 })
 
 export const orderSchema = z.object({

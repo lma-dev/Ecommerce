@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Controller, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createProductSchema } from "@/features/products/schemas/createProductSchema";
@@ -25,6 +25,9 @@ import {
 } from "@/features/products/constants/status";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategoriesQuery } from "@/features/categories/api";
+import { resolveAssetUrl } from "@/libs/assets";
+import ProductImageUploader from "./ProductImageUploader";
+import { uploadImageToCloudinary } from "@/libs/cloudinary";
 
 // --- Shared ProductForm Component ---
 const ProductForm = ({
@@ -58,12 +61,13 @@ const ProductForm = ({
         image: null,
       };
 
-  const activeSchema = mode === "edit" ? updateProductSchema : createProductSchema;
+  const activeSchema =
+    mode === "edit" ? updateProductSchema : createProductSchema;
   const form = useForm<FormValues>({
     resolver: zodResolver(activeSchema) as any,
     defaultValues: mappedDefaults as any,
   });
-  
+
   // Ensure categoryId is set from defaultValues on mount (robust preselect)
   useEffect(() => {
     if (mode === "edit") {
@@ -74,6 +78,22 @@ const ProductForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const existingImageUrl = useMemo(() => {
+    const rawImage = defaultValues?.image;
+    if (rawImage && typeof rawImage === "object" && "url" in rawImage) {
+      const url = (rawImage as { url?: string | null }).url;
+      if (url) {
+        return resolveAssetUrl(url) ?? url;
+      }
+    }
+
+    if (defaultValues?.imageUrl) {
+      return resolveAssetUrl(defaultValues.imageUrl) ?? defaultValues.imageUrl;
+    }
+
+    return undefined;
+  }, [defaultValues]);
   const locale = useLocale();
   const t = useTranslations("Translation");
 
@@ -81,21 +101,57 @@ const ProductForm = ({
   const update = useUpdateProduct();
   const { data: categoriesRes, isLoading: isLoadingCategories } =
     useCategoriesQuery(1, {});
+  const isProcessing =
+    create.isPending || update.isPending || form.formState.isSubmitting;
 
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: FormValues) => {
+    let imagePayload:
+      | Awaited<ReturnType<typeof uploadImageToCloudinary>>
+      | undefined;
+
+    if (values.image instanceof File) {
+      try {
+        imagePayload = await uploadImageToCloudinary(values.image);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Unable to upload image. Please try again.";
+        ToastAlert.error({ message });
+        return;
+      }
+    }
+
+    const basePayload = {
+      name: values.name,
+      description: values.description ?? null,
+      isActive: values.isActive,
+      price: Number(values.price),
+      categoryId: values.categoryId as number,
+    };
+
     if (mode === "edit" && defaultValues?.id) {
-      update.mutate(
-        { id: defaultValues.id, ...values },
-        {
-          onSuccess: () =>
-            ToastAlert.success({ message: t("updateSuccess") }),
-        }
-      );
+      try {
+        await update.mutateAsync({
+          id: defaultValues.id,
+          ...basePayload,
+          ...(imagePayload ? { image: imagePayload } : {}),
+        });
+        ToastAlert.success({ message: t("updateSuccess") });
+      } catch (_error) {
+        // handled by mutation onError
+      }
     } else {
-      create.mutate(values, {
-        onSuccess: () =>
-          ToastAlert.success({ message: t("createSuccess") }),
-      });
+      try {
+        await create.mutateAsync({
+          ...basePayload,
+          image: imagePayload ?? null,
+        });
+        form.setValue("image" as any, null, { shouldDirty: false });
+        ToastAlert.success({ message: t("createSuccess") });
+      } catch (_error) {
+        // handled by mutation onError
+      }
     }
   };
 
@@ -107,7 +163,10 @@ const ProductForm = ({
         placeholder={t("price")}
         type="number"
       />
-      <Textarea {...form.register("description")} placeholder={t("description")} />
+      <Textarea
+        {...form.register("description")}
+        placeholder={t("description")}
+      />
 
       {/* Category Select (shows name, submits id) */}
       <Controller
@@ -120,13 +179,15 @@ const ProductForm = ({
           const selectedId = field.value as number | null | undefined;
           const hasSelected =
             selectedId != null && categories.some((c) => c.id === selectedId);
-          const fallbackOption = !hasSelected && selectedId != null
-            ? {
-                id: selectedId,
-                name:
-                  defaultValues?.category?.name ?? `Current category (#${selectedId})`,
-              }
-            : null;
+          const fallbackOption =
+            !hasSelected && selectedId != null
+              ? {
+                  id: selectedId,
+                  name:
+                    defaultValues?.category?.name ??
+                    `Current category (#${selectedId})`,
+                }
+              : null;
 
           return (
             <Select
@@ -161,13 +222,12 @@ const ProductForm = ({
         name="image"
         control={form.control}
         render={({ field }) => (
-          <Input
-            id="image"
-            type="file"
-            accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
-            onChange={(e) => field.onChange(e.target.files?.[0] ?? null)}
-            ref={field.ref}
+          <ProductImageUploader
             name={field.name}
+            value={(field.value as File | null) ?? null}
+            onChange={field.onChange}
+            inputRef={field.ref}
+            existingImageUrl={existingImageUrl}
           />
         )}
       />
@@ -201,6 +261,7 @@ const ProductForm = ({
         </CustomLink>
         <FormSubmitButton
           text={mode === "edit" ? t("updateProduct") : t("createProduct")}
+          disabled={isProcessing}
         />
       </div>
     </form>
