@@ -35,10 +35,16 @@ export const NormalButton = ({
   );
 };
 
-export const FormSubmitButton = ({ text }: { text: string }) => {
+export const FormSubmitButton = ({ text, disabled = false }: { text: string; disabled?: boolean }) => {
   return (
     <div>
-      <Button variant="ghost" size="lg" type="submit" aria-label="Submit">
+      <Button
+        variant="ghost"
+        size="lg"
+        type="submit"
+        aria-label="Submit"
+        disabled={disabled}
+      >
         {text}
       </Button>
     </div>

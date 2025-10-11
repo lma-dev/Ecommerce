@@ -1,15 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productListSchema, productSchema } from './schemas/productSchema'
-import type { Product } from './types'
+import type { CreateProductPayload, Product, UpdateProductPayload } from './types'
 import ToastAlert from '@/app/[locale]/_components/ui/toast-box'
 import {
     createData,
-    createFormData,
     deleteSingleData,
     editData,
     fetchAllData,
     fetchSingleData,
 } from '@/libs/ApiMethodHelper'
+
+const stripUndefined = <T extends Record<string, unknown>>(input: T): T => {
+    const entries = Object.entries(input).filter(([, value]) => value !== undefined)
+    return Object.fromEntries(entries) as T
+}
 
 // Response types
 type ProductListResponse = {
@@ -103,22 +107,21 @@ export const useCreateProduct = () => {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: async (data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'> & { image?: File | null }) => {
-            // Build multipart form data to support image uploads
-            const form = new FormData()
-            form.append('name', String((data as any).name ?? ''))
-            if ((data as any).description != null) form.append('description', String((data as any).description ?? ''))
-            form.append('isActive', String((data as any).isActive))
-            form.append('price', String((data as any).price))
-            if ((data as any).categoryId != null) form.append('categoryId', String((data as any).categoryId))
-            if ((data as any).image instanceof File) form.append('image', (data as any).image)
+        mutationFn: async (data: CreateProductPayload) => {
+            const body = stripUndefined({
+                name: data.name,
+                description: data.description ?? null,
+                isActive: data.isActive,
+                price: data.price,
+                categoryId: data.categoryId,
+                image: data.image ?? null,
+            })
 
-            const res = await createData('/products', form)
+            const res = await createData('/products', body)
             return res.data
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] })
-            ToastAlert.success({ message: 'Product created successfully' })
         },
         onError: () => {
             ToastAlert.error({ message: "Failed to create product" })
@@ -133,22 +136,19 @@ export const useUpdateProduct = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (data: Partial<Product> & { id: number; image?: File | null }) => {
+        mutationFn: async (data: UpdateProductPayload) => {
             const { id, ...payload } = data;
 
-            // Build FormData
-            const form = new FormData();
-            Object.entries(payload).forEach(([key, value]) => {
-                if (value === undefined || value === null) return;
+            const body = stripUndefined({
+                name: payload.name,
+                description: payload.description ?? null,
+                isActive: payload.isActive,
+                price: payload.price,
+                categoryId: payload.categoryId,
+                image: payload.image,
+            })
 
-                if (key === "image" && value instanceof File) {
-                    form.append("image", value);
-                } else {
-                    // Convert everything else to string for safety
-                    form.append(key, String(value));
-                }
-            });
-            return await editData(`/products/${id}`, form);
+            return await editData(`/products/${id}`, body);
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["products"] });

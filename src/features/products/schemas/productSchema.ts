@@ -7,11 +7,25 @@ const categorySchema = z.object({
     name: z.string(),
 })
 
-const productImageSchema = z.object({
-    id: z.number(),
+const legacyProductImageSchema = z.object({
+    id: z.number().optional(),
     // Accept absolute URLs (http/https) or backend relative paths starting with '/'
     url: z.union([z.string().url(), z.string().startsWith('/')]),
 })
+
+const cloudinaryProductImageSchema = z.object({
+    public_id: z.string(),
+    url: z.string().url(),
+    format: z.string(),
+    width: z.number(),
+    height: z.number(),
+    bytes: z.number(),
+})
+
+const productImageSchema = z.union([
+    legacyProductImageSchema,
+    cloudinaryProductImageSchema,
+])
 
 export const productSchema = createProductSchema
     .omit({
