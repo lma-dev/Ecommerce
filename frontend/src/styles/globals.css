@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Design tokens for a light, friendly palette (Tailwind v4 @theme) */
+@theme {
+  /* Semantic colors */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a; /* slate-900 */
+
+  --color-muted: #f5f5f4; /* stone-100 */
+  --color-muted-foreground: #475569; /* slate-600 */
+
+  --color-accent: #fff7ed; /* orange-50 */
+  --color-accent-foreground: #1f2937; /* gray-800 */
+
+  --color-card: #ffffff;
+  --color-card-foreground: #111827;
+
+  --color-border: #e5e7eb; /* gray-200 */
+  /* Inputs should use border color, not white */
+  --color-input: #e5e7eb;
+  --color-ring: var(--color-primary);
+
+  /* Brand */
+  --color-primary: #f59e0b; /* amber-500 */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #fef3c7; /* amber-100 */
+  --color-secondary-foreground: #7c2d12; /* amber-900 */
+
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+/* Dark-mode safe: Keep light, readable surfaces (no heavy dark backgrounds) */
+@theme .dark {
+  --color-background: #fcfcfc; /* still light */
+  --color-foreground: #111827;
+  --color-muted: #f3f4f6;
+  --color-muted-foreground: #374151;
+  --color-accent: #fff7ed;
+  --color-accent-foreground: #1f2937;
+  --color-card: #ffffff;
+  --color-card-foreground: #111827;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: var(--color-primary);
+}
+
+/* Base resets */
+* { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { background: var(--color-background); color: var(--color-foreground); }
