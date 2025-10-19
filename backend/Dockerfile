@@ -26,6 +26,9 @@ RUN apk add --no-cache \
         git \
         icu-data-full \
         icu-libs \
+        libjpeg-turbo \
+        libpng \
+        libwebp \
         libzip \
         nodejs \
         npm \

@@ -11,12 +11,14 @@ import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import CustomerTopbar from '../_components/CustomerTopbar'
+import { useRouter } from 'next/navigation'
 
 export default function CustomerProfilePage() {
   const t = useTranslations('Translation')
   const { data: profile, isLoading } = useCustomerProfile()
   const update = useUpdateCustomerProfile()
   const destroy = useDeleteCustomerProfile()
+  const router = useRouter()
 
   const [form, setForm] = useState<{
     name?: string
@@ -48,7 +50,8 @@ export default function CustomerProfilePage() {
   const onDelete = async () => {
     try {
       await destroy.mutateAsync()
-      toast.success(t('deleteSuccess', { default: 'Account deleted' }))
+      toast.success(t('deleteSuccess'))
+      router.push('/')
     } catch (e: any) {
       console.error(e)
       toast.error(t('deleteFailed', { default: 'Delete failed' }))
