@@ -1,6 +1,6 @@
 # Ecommerce Monorepo Commands
 
-This project runs a Laravel 11 backend (PHP-FPM) and a Next.js frontend side by side via Docker Compose. Below are the commands you will run most often while developing or debugging the Sanctum SPA flow.
+This project runs a Laravel 12 backend and a Next.js frontend side by side via Docker Compose. Below are the commands you will run most often while developing or debugging the Sanctum SPA flow.
 
 ## 1. Boot the stack
 
