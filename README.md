@@ -58,3 +58,11 @@ pnpm lint
 - `/api/customer/login` returns 200/401/403 instead of 419
 
 Use this file as the single source of truth for the commands you need during local development.
+
+## 6. Console Password
+```bash
+- gmail - superadmin@gmail.com
+- password - 12345678
+
+```
+
