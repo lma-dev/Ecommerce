@@ -31,10 +31,10 @@ type CustomerFilters = {
 
 // LIST
 export const fetchCustomers = async (
-    page: number,
-    filters: CustomerFilters = {},
+  page: number,
+  filters: CustomerFilters = {},
 ): Promise<CustomerListResponse> => {
-    const params = new URLSearchParams({ page: String(page) })
+  const params = new URLSearchParams({ page: String(page) })
   if (filters.generalSearch) {
     params.set('generalSearch', filters.generalSearch)
   } else {
@@ -57,10 +57,7 @@ export const fetchCustomers = async (
   }
 }
 
-export const useCustomersQuery = (
-  page: number,
-  filters: CustomerFilters = {},
-) =>
+export const useCustomersQuery = (page: number, filters: CustomerFilters = {}) =>
   useQuery({
     queryKey: ['customers', page, filters],
     queryFn: () => fetchCustomers(page, filters),
@@ -104,7 +101,6 @@ export const useCreateCustomer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      ToastAlert.success({ message: 'Customer created successfully' })
     },
     onError: () => {
       ToastAlert.error({ message: 'Failed to create customer' })
