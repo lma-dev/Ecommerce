@@ -23,6 +23,13 @@ docker compose exec backend php artisan queue:work
 - Frontend dev server is on `http://localhost:3000`
 - MySQL 8 listens on `localhost:3306`
 
+- Console Login 
+`http://localhost:3000/en/login?type=console`
+
+- Customer Login 
+`http://localhost:3000/en`
+
+
 Stop everything with `CTRL+C` or `docker compose down`.
 
 ## 2. For Testing Backend
