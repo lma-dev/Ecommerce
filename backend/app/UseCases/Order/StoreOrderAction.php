@@ -18,6 +18,7 @@ class StoreOrderAction
             $status = $data['status'] ?? OrderStatusType::PENDING;
             $notes = $data['notes'] ?? null;
             $shippingAddress = $data['shippingAddress'] ?? null;
+            $orderCode = uuidGenerator();
 
             $order = Order::create([
                 'customer_id'      => $customerId,
@@ -25,6 +26,7 @@ class StoreOrderAction
                 'notes'            => $notes,
                 'shipping_address' => $shippingAddress,
                 'total_amount'     => 0,
+                'order_code'       => $orderCode,
             ]);
 
             // Build product => ['quantity' => count] map from duplicates

@@ -363,16 +363,14 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
         );
       }
 
-      if (opts?.orderId) {
-        const scopedChannel = `${channelName}.${opts.orderId}`;
-        subscribeChannel(
-          () => echoInstance!.private(scopedChannel),
-          scopedChannel,
-          `private:${scopedChannel}`
-        );
-      }
-
       if (opts?.customerId) {
+        const legacyCustomerChannel = `${channelName}.${opts.customerId}`;
+        subscribeChannel(
+          () => echoInstance!.private(legacyCustomerChannel),
+          legacyCustomerChannel,
+          `private:${legacyCustomerChannel}`
+        );
+
         const customerChannel = `${channelName}.customer.${opts.customerId}`;
         subscribeChannel(
           () => echoInstance!.private(customerChannel),

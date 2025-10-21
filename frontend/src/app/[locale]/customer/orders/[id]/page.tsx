@@ -1,70 +1,73 @@
-"use client";
+'use client'
 
-import CustomerTopbar from "../../_components/CustomerTopbar";
-import { useCustomerOrder } from "@/features/customer/orders/api";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { resolveAssetUrl } from "@/libs/assets";
-import { useCustomerProfile } from "@/features/customer/profile/api";
-import { useRealtimeOrders } from "@/features/orders/useRealtimeOrders";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import CustomerTopbar from '../../_components/CustomerTopbar'
+import { useCustomerOrder } from '@/features/customer/orders/api'
+import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { resolveAssetUrl } from '@/libs/assets'
+import { useCustomerProfile } from '@/features/customer/profile/api'
+import { useRealtimeOrders } from '@/features/orders/useRealtimeOrders'
+import { Link } from '@/i18n/navigation'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import { formatCurrency, formatDate, prettyStatus, statusBadgeClass } from '@/libs/FunctionalHelper'
 
 export default function CustomerOrderDetailPage() {
-  const t = useTranslations("Translation");
-  const params = useParams() as { id?: string };
-  const id = params?.id;
-  const numericId = id ? Number(id) : undefined;
-  const { data: profile } = useCustomerProfile();
+  const t = useTranslations('Translation')
+  const params = useParams() as { id?: string }
+  const id = params?.id
+  const numericId = id ? Number(id) : undefined
+  const { data: profile } = useCustomerProfile()
   useRealtimeOrders({
     orderId: numericId,
     customerId: profile?.id,
     includeGlobalChannel: false,
-  });
-  const { data: order, isLoading } = useCustomerOrder(id);
+  })
+  const { data: order, isLoading } = useCustomerOrder(id)
+  const orderNumber = order?.orderCode || id
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <CustomerTopbar />
 
       <section className="max-w-4xl mx-auto w-full space-y-4">
-        <Link
-          href={{ pathname: "/customer/orders" }}
-          aria-label={t("backToOrders") as string}
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-2 flex items-center gap-2"
-          >
+        <Link href={{ pathname: '/customer/orders' }} aria-label={t('backToOrders') as string}>
+          <Button variant="ghost" size="sm" className="-ml-2 flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            <span>{t("back")}</span>
+            <span>{t('back')}</span>
           </Button>
         </Link>
         <h1 className="text-2xl font-bold">
-          {t("orders")} #{id}
+          {t('orderDetailsTitle', { default: 'Order Details' })}{' '}
+          <span className="text-emerald-700">#{orderNumber}</span>
         </h1>
 
-        {isLoading && (
-          <div className="text-sm text-neutral-500"> {t("loading")}</div>
-        )}
+        {isLoading && <div className="text-sm text-neutral-500"> {t('loading')}</div>}
         {!isLoading && !order && (
-          <div className="text-sm text-neutral-500">{t("orderNotFound")}</div>
+          <div className="text-sm text-neutral-500">{t('orderNotFound')}</div>
         )}
 
         {order && (
           <div className="rounded-2xl border bg-white p-4 md:p-6 space-y-4">
+            <div className="text-sm text-neutral-600 border-b border-neutral-200 pb-3">
+              {t('orderNumberLabel', { default: 'Order Number' })}{' '}
+              <span className="font-semibold text-neutral-900">#{order.orderCode || order.id}</span>
+            </div>
+            {order.shippingAddress ? (
+              <div className="text-sm text-neutral-600">
+                {t('shippingAddress', { default: 'Shipping Address' })}:{' '}
+                <span className="font-medium text-neutral-900">{order.shippingAddress}</span>
+              </div>
+            ) : null}
+
             <div className="text-sm text-neutral-700 flex items-center gap-2 flex-wrap">
-              <span className={statusBadgeClass(order.status)}>
-                {prettyStatus(order.status)}
-              </span>
+              <span className={statusBadgeClass(order.status)}>{prettyStatus(order.status)}</span>
               <span className="text-neutral-500">
                 {formatDate(order.createdAt || order.created_at)}
               </span>
               <span className="mx-1 text-neutral-300">•</span>
               <span>
-                {t("total")}:{" "}
+                {t('total')}:{' '}
                 <span className="font-semibold">
                   {formatCurrency(order.totalAmount || order.total || 0)}
                 </span>
@@ -80,7 +83,7 @@ export default function CustomerOrderDetailPage() {
                   <img
                     src={
                       resolveAssetUrl(p.image?.url || p.imageUrl) ||
-                      "https://via.placeholder.com/160x160.png?text=Product"
+                      'https://via.placeholder.com/160x160.png?text=Product'
                     }
                     alt={p.name}
                     className="w-16 h-16 object-contain rounded bg-white"
@@ -92,9 +95,7 @@ export default function CustomerOrderDetailPage() {
                         x{p.quantity ?? 1}
                       </span>
                     </div>
-                    <div className="text-xs text-neutral-500">
-                      {formatCurrency(p.price)}
-                    </div>
+                    <div className="text-xs text-neutral-500">{formatCurrency(p.price)}</div>
                   </div>
                 </div>
               ))}
@@ -103,47 +104,5 @@ export default function CustomerOrderDetailPage() {
         )}
       </section>
     </div>
-  );
-}
-
-function formatCurrency(n?: number) {
-  if (typeof n !== "number") return "-";
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: "MMK",
-    }).format(n);
-  } catch {
-    return String(n);
-  }
-}
-function formatDate(s?: string) {
-  if (!s) return "-";
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(s));
-  } catch {
-    return s;
-  }
-}
-
-function statusBadgeClass(status?: string) {
-  const base =
-    "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border";
-  switch ((status || "").toUpperCase()) {
-    case "COMPLETED":
-      return base + " bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "CANCELLED":
-      return base + " bg-rose-50 text-rose-700 border-rose-200";
-    case "PENDING":
-    default:
-      return base + " bg-amber-50 text-amber-700 border-amber-200";
-  }
-}
-
-function prettyStatus(status?: string) {
-  if (!status) return "-";
-  return status.charAt(0) + status.slice(1).toLowerCase();
+  )
 }

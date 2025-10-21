@@ -2,7 +2,6 @@
 
 namespace App\UseCases\Order;
 
-use App\Enums\OrderStatusType;
 use App\Events\OrderUpdated;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
@@ -15,7 +14,7 @@ class UpdateOrderAction
         return DB::transaction(function () use ($order, $data) {
             $productIds = $data['productIds'] ?? [];
             $customerId = $data['customerId'] ?? null;
-            $status = $data['status'] ?? OrderStatusType::PENDING;
+            $status = array_key_exists('status', $data) ? $data['status'] : null;
             $notes = $data['notes'] ?? null;
             $shippingAddress = $data['shippingAddress'] ?? null;
 

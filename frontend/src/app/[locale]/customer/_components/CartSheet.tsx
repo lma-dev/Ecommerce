@@ -1,18 +1,22 @@
-"use client";
+'use client'
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/features/customer/cart/hooks";
-import { useTranslations } from "next-intl";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { resolveAssetUrl } from "@/libs/assets";
-import { useState } from "react";
-import { createCustomerOrder } from "@/features/customer/orders/api";
-import { toast } from "sonner";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { useCart } from '@/features/customer/cart/hooks'
+import { useLocale, useTranslations } from 'next-intl'
+import { Minus, Plus, Trash2 } from 'lucide-react'
+import { resolveAssetUrl } from '@/libs/assets'
+import { useState } from 'react'
+import { createCustomerOrder } from '@/features/customer/orders/api'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { formatCurrency } from '@/libs/FunctionalHelper'
 
 export default function CartSheet({ children }: { children: React.ReactNode }) {
-  const t = useTranslations("Translation");
-  const { items, updateQty, remove, subtotal, clear } = useCart();
+  const t = useTranslations('Translation')
+  const locale = useLocale()
+  const router = useRouter()
+  const { items, updateQty, remove, subtotal, clear } = useCart()
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -24,10 +28,13 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
       // Send duplicates to represent quantity (e.g., [1,1,2] => 2x #1, 1x #2)
       const productIds = items.flatMap((i) => Array(Math.max(1, i.qty || 1)).fill(i.id))
       const payload = { productIds }
-      await createCustomerOrder(payload)
+      const order = await createCustomerOrder(payload)
       toast.success(t('orderSubmitted', { default: 'Order placed successfully' }))
       clear()
       setOpen(false)
+      if (order?.id) {
+        router.push(`/${locale}/customer/orders/${order.id}/payment`)
+      }
     } catch (e: any) {
       console.error('Checkout failed', e)
       toast.error(t('orderFailed', { default: 'Failed to place order' }))
@@ -41,17 +48,25 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md bg-white">
         <SheetHeader className="border-b border-neutral-200 pb-3 bg-white px-4">
-          <SheetTitle>{t("cart")}</SheetTitle>
+          <SheetTitle>{t('cart')}</SheetTitle>
         </SheetHeader>
         <div className="mt-2 px-4 flex flex-col gap-4 h-[calc(100%-6.5rem)] bg-white">
           <div className="flex-1 overflow-auto space-y-3 bg-white pb-2">
             {items.length === 0 ? (
-              <div className="text-center text-sm text-muted-foreground py-10">{t("emptyCart")}</div>
+              <div className="text-center text-sm text-muted-foreground py-10">
+                {t('emptyCart')}
+              </div>
             ) : (
               items.map((item) => (
-                <div key={item.id} className="flex gap-3 items-center border border-neutral-200 rounded-xl p-3 bg-neutral-50">
+                <div
+                  key={item.id}
+                  className="flex gap-3 items-center border border-neutral-200 rounded-xl p-3 bg-neutral-50"
+                >
                   <img
-                    src={resolveAssetUrl(item.imageUrl) || "https://via.placeholder.com/160x160.png?text=Product"}
+                    src={
+                      resolveAssetUrl(item.imageUrl) ||
+                      'https://via.placeholder.com/160x160.png?text=Product'
+                    }
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-md bg-muted"
                   />
@@ -76,7 +91,12 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
                       </Button>
                     </div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => remove(item.id)} className="text-neutral-500 hover:text-red-600">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => remove(item.id)}
+                    className="text-neutral-500 hover:text-red-600"
+                  >
                     <Trash2 className="size-4" />
                   </Button>
                 </div>
@@ -85,8 +105,10 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
           </div>
           <div className="border-t border-neutral-200 pt-4 pb-4 space-y-3 bg-white px-4 -mx-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-neutral-600">{t("total")}</div>
-              <div className="text-base font-semibold text-neutral-900">{formatCurrency(subtotal)}</div>
+              <div className="text-sm text-neutral-600">{t('total')}</div>
+              <div className="text-base font-semibold text-neutral-900">
+                {formatCurrency(subtotal)}
+              </div>
             </div>
             <div className="flex gap-2">
               <Button
@@ -94,20 +116,20 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
                 disabled={items.length === 0 || isSubmitting}
                 onClick={handleCheckout}
               >
-                {isSubmitting ? t('processing', { default: 'Processing...' }) : t("checkout")}
+                {isSubmitting ? t('processing', { default: 'Processing...' }) : t('checkout')}
               </Button>
-              <Button variant="secondary" onClick={clear} disabled={items.length === 0} className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700">
-                {t("clear")}
+              <Button
+                variant="secondary"
+                onClick={clear}
+                disabled={items.length === 0}
+                className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700"
+              >
+                {t('clear')}
               </Button>
             </div>
           </div>
         </div>
       </SheetContent>
     </Sheet>
-  );
-}
-
-function formatCurrency(n?: number) {
-  if (typeof n !== 'number') return '-'
-  try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'MMK' }).format(n) } catch { return String(n) }
+  )
 }

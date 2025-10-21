@@ -38,6 +38,7 @@ export const orderSchema = z.object({
   customer: orderCustomerSchema.optional().nullable(),
   status: z.enum(orderStatusOptions),
   notes: z.string().nullable().optional(),
+  orderCode: z.string().nullable().optional(),
   totalAmount: z.number(),
   total: z.number().optional(),
   shippingAddress: z.string().nullable().optional(),
