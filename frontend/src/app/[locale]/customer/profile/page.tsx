@@ -60,10 +60,10 @@ export default function CustomerProfilePage() {
     if (!form) return
     try {
       await update.mutateAsync(form)
-      toast.success(t('updateSuccess', { default: 'Successfully updated' }))
+      toast.success(t('updateSuccess'))
     } catch (e: any) {
       console.error(e)
-      toast.error(t('updateFailed', { default: 'Update failed' }))
+      toast.error(t('updateFailed'))
     }
   }
 
@@ -74,7 +74,7 @@ export default function CustomerProfilePage() {
       router.push('/')
     } catch (e: any) {
       console.error(e)
-      toast.error(t('deleteFailed', { default: 'Delete failed' }))
+      toast.error(t('deleteFailed'))
     } finally {
       setConfirmDeleteOpen(false)
     }
@@ -148,8 +148,8 @@ export default function CustomerProfilePage() {
                   disabled={update.isPending}
                 >
                   {update.isPending
-                    ? t('processing', { default: 'Processing...' })
-                    : t('save', { default: 'Save changes' })}
+                    ? t('processing')
+                    : t('save')}
                 </Button>
                 <Button
                   variant="secondary"
@@ -170,7 +170,7 @@ export default function CustomerProfilePage() {
                   onClick={() => setConfirmDeleteOpen(true)}
                   disabled={destroy.isPending}
                 >
-                  {t('delete', { default: 'Delete' })}
+                  {t('delete')}
                 </Button>
               </div>
             </>
@@ -180,11 +180,9 @@ export default function CustomerProfilePage() {
       <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('delete', { default: 'Delete' })}</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteProfileConfirmation', {
-                default: 'This will permanently remove your profile and order history. Are you sure?',
-              })}
+              {t('deleteProfileConfirmation')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -193,7 +191,7 @@ export default function CustomerProfilePage() {
             </AlertDialogCancel>
             <AlertDialogAction onClick={onDelete} disabled={destroy.isPending}>
               {destroy.isPending
-                ? t('processing', { default: 'Processing...' })
+                ? t('processing')
                 : t('confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>

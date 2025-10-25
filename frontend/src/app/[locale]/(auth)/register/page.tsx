@@ -154,7 +154,7 @@ export default function RegisterPage() {
                 name="password_confirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('confirmPassword', { default: 'Confirm Password' })}</FormLabel>
+                    <FormLabel>{t('confirmPassword')}</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="********" {...field} />
                     </FormControl>

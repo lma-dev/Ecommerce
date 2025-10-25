@@ -10,10 +10,10 @@ export default function ContactPage() {
       <CustomerTopbar />
       <section className="max-w-3xl mx-auto text-center space-y-3">
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-neutral-900">
-          {t('contactTitle', { default: 'Contact Us' })}
+          {t('contactTitle')}
         </h1>
         <p className="text-neutral-600">
-          {t('contactSubtitle', { default: "We'd love to hear from you." })}
+          {t('contactSubtitle')}
         </p>
       </section>
 
@@ -21,13 +21,13 @@ export default function ContactPage() {
         <div className="rounded-2xl border p-5 bg-white">
           <div className="text-sm text-neutral-700">
             <div className="mb-2">
-              <strong>{t('email', { default: 'Email' })}:</strong> lwinmoeaung.it@gmail.com
+              <strong>{t('email')}:</strong> lwinmoeaung.it@gmail.com
             </div>
             <div className="mb-2">
-              <strong>{t('phone', { default: 'Phone' })}:</strong> +81 9 000 000 000
+              <strong>{t('phone')}:</strong> +81 9 000 000 000
             </div>
             <div>
-              <strong>{t('address', { default: 'Address' })}:</strong> 123 Sample Street, Japan
+              <strong>{t('address')}:</strong> 123 Sample Street, Japan
             </div>
           </div>
         </div>

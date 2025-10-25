@@ -23,12 +23,12 @@ export default function CustomerOrdersPage() {
         <div className="rounded-2xl border border-amber-200 bg-amber-50 divide-y divide-amber-100">
           {isLoading && (
             <div className="p-4 text-sm text-neutral-500">
-              {t('loadingOrders', { default: 'Loading orders...' })}
+              {t('loadingOrders')}
             </div>
           )}
           {!isLoading && (!orders || orders.length === 0) && (
             <div className="p-4 text-sm text-neutral-500">
-              {t('noOrders', { default: 'No orders yet' })}
+              {t('noOrders')}
             </div>
           )}
           {(orders ?? []).map((o: any) => (

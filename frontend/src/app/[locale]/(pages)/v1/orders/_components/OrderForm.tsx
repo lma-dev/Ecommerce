@@ -194,7 +194,7 @@ const OrderForm = ({ mode, defaultValues }: { mode: 'create' | 'edit'; defaultVa
             <SelectContent>
               {orderStatusOptions.map((st) => (
                 <SelectItem key={st} value={st}>
-                  {t(st.toLowerCase() as any, { default: st })}
+                  {t(st.toLowerCase() as any)}
                 </SelectItem>
               ))}
             </SelectContent>

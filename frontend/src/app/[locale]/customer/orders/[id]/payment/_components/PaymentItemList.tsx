@@ -24,9 +24,7 @@ export function PaymentItemList({
   if (!items.length) {
     return (
       <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-6 text-center text-sm text-neutral-500">
-        {t('orderItemsEmpty', {
-          default: 'There are no items in this order yet.',
-        })}
+        {t('orderItemsEmpty')}
       </div>
     )
   }
@@ -57,7 +55,7 @@ export function PaymentItemList({
                     size="icon"
                     onClick={() => onRemoveItem(item.id)}
                     className="h-8 w-8 text-neutral-400 hover:text-rose-600"
-                    aria-label={t('removeItem', { default: 'Remove item' })}
+                    aria-label={t('removeItem')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -66,7 +64,7 @@ export function PaymentItemList({
             </div>
             <div className="flex items-center justify-between gap-3 md:w-48">
               <span className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-                {t('quantity', { default: 'Quantity' })}
+                {t('quantity')}
               </span>
               <div className="flex items-center gap-2">
                 <Button
@@ -75,9 +73,7 @@ export function PaymentItemList({
                   size="icon"
                   onClick={() => onQuantityChange(item.id, item.quantity - 1)}
                   disabled={item.quantity <= 1}
-                  aria-label={t('decreaseQuantity', {
-                    default: 'Decrease quantity',
-                  })}
+                  aria-label={t('decreaseQuantity')}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -87,9 +83,7 @@ export function PaymentItemList({
                   variant="outline"
                   size="icon"
                   onClick={() => onQuantityChange(item.id, item.quantity + 1)}
-                  aria-label={t('increaseQuantity', {
-                    default: 'Increase quantity',
-                  })}
+                  aria-label={t('increaseQuantity')}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -100,7 +94,7 @@ export function PaymentItemList({
       </div>
 
       <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 shadow-sm">
-        <span>{t('orderSummary', { default: 'Order Summary' })}</span>
+        <span>{t('orderSummary')}</span>
         <span>{formatCurrency(total)}</span>
       </div>
     </div>

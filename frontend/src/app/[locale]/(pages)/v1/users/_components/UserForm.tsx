@@ -154,10 +154,10 @@ const UserForm = ({
           <div className="relative">
             <Input
               type={showPassword2 ? "text" : "password"}
-              placeholder={t("confirmPassword", { default: "Confirm Password" })}
+              placeholder={t("confirmPassword")}
               autoComplete="new-password"
               {...form.register("password_confirmation", {
-                validate: (v) => v === (form.getValues() as any).password || t("confirmPassword", { default: "Confirm Password" }),
+                validate: (v) => v === (form.getValues() as any).password || t("confirmPassword"),
               })}
             />
             <button

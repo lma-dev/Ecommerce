@@ -29,9 +29,7 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
       )
       const order = await createCustomerOrder({ productIds, status: 'DRAFT' })
       toast.success(
-        t('orderDraftCreated', {
-          default: 'Draft order saved. Please complete your checkout details.',
-        }),
+        t('orderDraftCreated'),
       )
       clear()
       setOpen(false)
@@ -43,9 +41,7 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Checkout failed', error)
       toast.error(
-        t('orderDraftFailed', {
-          default: 'We could not start the checkout. Please try again.',
-        }),
+        t('orderDraftFailed'),
       )
     } finally {
       setIsSubmitting(false)
@@ -126,7 +122,7 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
                 onClick={handleCheckout}
               >
                 {isSubmitting
-                  ? t('processing', { default: 'Processing...' })
+                  ? t('processing')
                   : t('checkout')}
               </Button>
               <Button

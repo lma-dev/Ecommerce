@@ -2,6 +2,16 @@
 
 import CustomerTopbar from '@/app/[locale]/customer/_components/CustomerTopbar'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { useCustomerOrder, updateCustomerOrder } from '@/features/customer/orders/api'
 import { useCustomerProfile } from '@/features/customer/profile/api'
 import { useRealtimeOrders } from '@/features/orders/useRealtimeOrders'
@@ -28,6 +38,7 @@ export default function CustomerOrderPaymentPage() {
   const [notes, setNotes] = useState('')
   const [items, setItems] = useState<PaymentItem[]>([])
   const [hasChanges, setHasChanges] = useState(false)
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const router = useRouter()
   const locale = useLocale()
   const qc = useQueryClient()
@@ -79,11 +90,7 @@ export default function CustomerOrderPaymentPage() {
   const { mutateAsync: saveOrder, isPending: isSaving } = useMutation({
     mutationFn: updateCustomerOrder,
     onSuccess: (updated) => {
-      toast.success(
-        t('orderProceedSuccess', {
-          default: 'Order updated. We are getting it ready for payment.',
-        }),
-      )
+      toast.success(t('orderProceedSuccess'))
       const normalized = formatItems(updated?.products)
       setItems(normalized)
       setShippingAddress(updated?.shippingAddress ?? '')
@@ -95,11 +102,7 @@ export default function CustomerOrderPaymentPage() {
       }
     },
     onError: () => {
-      toast.error(
-        t('orderUpdateFailed', {
-          default: 'Failed to save order details. Please try again.',
-        }),
-      )
+      toast.error(t('orderUpdateFailed'))
     },
   })
 
@@ -138,11 +141,7 @@ export default function CustomerOrderPaymentPage() {
 
   const handleRemoveItem = (productId: number) => {
     if (items.length <= 1) {
-      toast.error(
-        t('orderMustHaveItem', {
-          default: 'Please keep at least one item in your order.',
-        }),
-      )
+      toast.error(t('orderMustHaveItem'))
       return
     }
     let removed = false
@@ -164,9 +163,7 @@ export default function CustomerOrderPaymentPage() {
       return updateCustomerOrder({ orderId, status: 'CANCELLED' })
     },
     onSuccess: (updated) => {
-      toast.success(
-        t('orderCancelSuccess', { default: 'Order cancelled successfully.' }),
-      )
+      toast.success(t('orderCancelSuccess'))
       if (updated?.id) {
         qc.setQueryData(['customer', 'orders', updated.id], updated)
         qc.invalidateQueries({ queryKey: ['customer', 'orders'] })
@@ -174,11 +171,7 @@ export default function CustomerOrderPaymentPage() {
       router.push(`/${locale}/customer/orders`)
     },
     onError: () => {
-      toast.error(
-        t('orderCancelFailed', {
-          default: 'Failed to cancel the order. Please try again.',
-        }),
-      )
+      toast.error(t('orderCancelFailed'))
     },
   })
 
@@ -187,20 +180,12 @@ export default function CustomerOrderPaymentPage() {
     if (!order) return
     const trimmedAddress = shippingAddress.trim()
     if (!trimmedAddress) {
-      toast.error(
-        t('shippingAddressRequired', {
-          default: 'Please provide a shipping address before proceeding.',
-        }),
-      )
+      toast.error(t('shippingAddressRequired'))
       return
     }
     const productIds = items.flatMap((item) => Array.from({ length: item.quantity }, () => item.id))
     if (productIds.length === 0) {
-      toast.error(
-        t('orderMustHaveItem', {
-          default: 'Please keep at least one item in your order.',
-        }),
-      )
+      toast.error(t('orderMustHaveItem'))
       return
     }
     await saveOrder({
@@ -212,15 +197,19 @@ export default function CustomerOrderPaymentPage() {
     })
   }
 
-  const handleCancelOrder = async () => {
+  const requestCancelOrder = () => {
     if (!order) return
-    const confirmed = window.confirm(
-      t('confirmCancelOrder', {
-        default: 'Are you sure you want to cancel this order?',
-      }),
-    )
-    if (!confirmed) return
-    await cancelOrderMutation(order.id)
+    setIsCancelDialogOpen(true)
+  }
+
+  const confirmCancelOrder = async () => {
+    if (!order) return
+    try {
+      await cancelOrderMutation(order.id)
+      setIsCancelDialogOpen(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const goToOrderDetail = () => {
@@ -249,33 +238,33 @@ export default function CustomerOrderPaymentPage() {
       <section className="max-w-4xl mx-auto w-full space-y-4">
         <Link
           href={{ pathname: '/customer/orders' }}
-          aria-label={t('backToOrders', { default: 'Back to orders' })}
+          aria-label={t('backToOrders')}
         >
           <Button variant="ghost" size="sm" className="-ml-2 mb-1 flex items-center gap-2">
             <span aria-hidden>←</span>
-            <span>{t('back', { default: 'Back' })}</span>
+            <span>{t('back')}</span>
           </Button>
         </Link>
 
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">
-            {t('paymentTitle', { default: 'Complete Your Payment' })}
+            {t('paymentTitle')}
           </h1>
           {order && (
             <p className="text-sm text-neutral-600">
-              {t('orderNumberLabel', { default: 'Order Number' })}:{' '}
+              {t('orderNumberLabel')}:{' '}
               <span className="font-semibold">#{order.orderCode || order.id}</span>
             </p>
           )}
         </div>
 
         {isLoading && (
-          <div className="text-sm text-neutral-500">{t('loading', { default: 'Loading...' })}</div>
+          <div className="text-sm text-neutral-500">{t('loading')}</div>
         )}
 
         {!isLoading && !order && (
           <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-6 text-center text-sm text-neutral-500">
-            {t('orderNotFound', { default: 'Order not found' })}
+            {t('orderNotFound')}
           </div>
         )}
 
@@ -285,7 +274,7 @@ export default function CustomerOrderPaymentPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-sm text-neutral-600">
-                    {t('orderNumberLabel', { default: 'Order Number' })}:{' '}
+                    {t('orderNumberLabel')}:{' '}
                     <span className="font-semibold text-neutral-900">
                       #{order.orderCode || order.id}
                     </span>
@@ -296,14 +285,14 @@ export default function CustomerOrderPaymentPage() {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600">
                 <span>
-                  {t('total', { default: 'Total' })}:{' '}
+                  {t('total')}:{' '}
                   <span className="font-semibold text-neutral-900">
                     {formatCurrency(displayedTotal)}
                   </span>
                 </span>
                 <span className="text-neutral-300">•</span>
                 <span>
-                  {t('status', { default: 'Status' })}: {prettyStatus(order.status)}
+                  {t('status')}: {prettyStatus(order.status)}
                 </span>
               </div>
             </div>
@@ -332,12 +321,28 @@ export default function CustomerOrderPaymentPage() {
                 orderStatus={order?.status}
                 onSubmit={handleSubmit}
                 onViewOrder={goToOrderDetail}
-                onCancel={handleCancelOrder}
+                onCancel={requestCancelOrder}
               />
             </div>
           </div>
         )}
       </section>
+      <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cancelOrder')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('confirmCancelOrder')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCancelling}>
+              {t('cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancelOrder} disabled={isCancelling}>
+              {isCancelling ? t('processing') : t('confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

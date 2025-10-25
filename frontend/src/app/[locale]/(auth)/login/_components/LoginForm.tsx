@@ -107,7 +107,7 @@ export default function LoginForm() {
           {isLoading ? t("loggingIn") : t("login")}
         </Button>
         <p className="text-xs text-muted-foreground text-center">
-          {t("contactAdminForAccess", { default: "Need access? Contact your administrator." })}
+          {t("contactAdminForAccess")}
         </p>
       </form>
     </Form>

@@ -12,7 +12,7 @@ export default function ReportEditPage() {
   const t = useTranslations("Translation");
 
   if (isLoading) return <div>{t("loadingReports")}</div>;
-  if (!report) return <div>{t("reportNotFound", { default: "Report not found" })}</div>;
+  if (!report) return <div>{t("reportNotFound")}</div>;
 
   return (
     <div>
