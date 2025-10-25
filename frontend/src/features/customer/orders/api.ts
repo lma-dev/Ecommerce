@@ -1,6 +1,7 @@
 import { callCustomerApi } from '@/libs/customerApi'
 import { useQuery } from '@tanstack/react-query'
 import type { Order } from '@/features/orders/types'
+import type { OrderStatusType } from '@/features/orders/constants/status'
 
 type ApiResponse<T> = {
   data: T
@@ -12,6 +13,7 @@ export type CreateCustomerOrderInput = {
   productIds: number[]
   notes?: string | null
   shippingAddress?: string | null
+  status?: OrderStatusType
 }
 
 export type UpdateCustomerOrderInput = {
@@ -19,6 +21,7 @@ export type UpdateCustomerOrderInput = {
   notes?: string | null
   shippingAddress?: string | null
   productIds?: number[]
+  status?: OrderStatusType
 }
 
 export async function createCustomerOrder(payload: CreateCustomerOrderInput) {

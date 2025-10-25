@@ -9,6 +9,7 @@ import { useCustomerLogin } from "@/features/customer-auth/hooks";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import React from "react";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormField,
@@ -22,13 +23,19 @@ export default function CustomerLoginForm() {
   const t = useTranslations("Translation");
   const locale = useLocale();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
   const { mutate, isPending, error } = useCustomerLogin();
+  const isLoading = isPending || isRedirecting;
 
-  const onSubmit = (data: LoginInput) => mutate(data);
+  const onSubmit = (data: LoginInput) =>
+    mutate(data, {
+      onSuccess: () => setIsRedirecting(true),
+      onError: () => setIsRedirecting(false),
+    });
 
   return (
     <Form {...form}>
@@ -91,8 +98,11 @@ export default function CustomerLoginForm() {
             {t("register")}
           </Link>
         </div>
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? t("loggingIn") : t("signIn")}
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading && (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          )}
+          {isLoading ? t("loggingIn") : t("signIn")}
         </Button>
       </form>
     </Form>

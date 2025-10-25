@@ -7,37 +7,46 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { resolveAssetUrl } from '@/libs/assets'
 import { useState } from 'react'
+import { formatCurrency } from '@/libs/FunctionalHelper'
+import { useRouter } from 'next/navigation'
 import { createCustomerOrder } from '@/features/customer/orders/api'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
-import { formatCurrency } from '@/libs/FunctionalHelper'
 
 export default function CartSheet({ children }: { children: React.ReactNode }) {
   const t = useTranslations('Translation')
-  const locale = useLocale()
-  const router = useRouter()
   const { items, updateQty, remove, subtotal, clear } = useCart()
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
+  const locale = useLocale()
 
   const handleCheckout = async () => {
     if (items.length === 0 || isSubmitting) return
     setIsSubmitting(true)
     try {
-      // Backend expects productIds: number[]
-      // Send duplicates to represent quantity (e.g., [1,1,2] => 2x #1, 1x #2)
-      const productIds = items.flatMap((i) => Array(Math.max(1, i.qty || 1)).fill(i.id))
-      const payload = { productIds }
-      const order = await createCustomerOrder(payload)
-      toast.success(t('orderSubmitted', { default: 'Order placed successfully' }))
+      const productIds = items.flatMap((item) =>
+        Array.from({ length: Math.max(1, item.qty || 1) }, () => item.id),
+      )
+      const order = await createCustomerOrder({ productIds, status: 'DRAFT' })
+      toast.success(
+        t('orderDraftCreated', {
+          default: 'Draft order saved. Please complete your checkout details.',
+        }),
+      )
       clear()
       setOpen(false)
       if (order?.id) {
-        router.push(`/${locale}/customer/orders/${order.id}/payment`)
+        setTimeout(() => {
+          router.push(`/${locale}/customer/orders/${order.id}/payment`)
+        }, 150)
       }
-    } catch (e: any) {
-      console.error('Checkout failed', e)
-      toast.error(t('orderFailed', { default: 'Failed to place order' }))
+    } catch (error) {
+      console.error('Checkout failed', error)
+      toast.error(
+        t('orderDraftFailed', {
+          default: 'We could not start the checkout. Please try again.',
+        }),
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -116,7 +125,9 @@ export default function CartSheet({ children }: { children: React.ReactNode }) {
                 disabled={items.length === 0 || isSubmitting}
                 onClick={handleCheckout}
               >
-                {isSubmitting ? t('processing', { default: 'Processing...' }) : t('checkout')}
+                {isSubmitting
+                  ? t('processing', { default: 'Processing...' })
+                  : t('checkout')}
               </Button>
               <Button
                 variant="secondary"

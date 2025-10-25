@@ -10,6 +10,7 @@ use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Http\Resources\Customer\CustomerResource;
 use App\UseCases\Customer\DeleteCustomerAction;
 use App\UseCases\Customer\DetailCustomerAction;
+use App\UseCases\Customer\GetAllCustomersAction;
 use App\UseCases\Customer\GetCustomerAction;
 use App\UseCases\Customer\StoreCustomerAction;
 use App\UseCases\Customer\UpdateCustomerAction;
@@ -22,6 +23,12 @@ class CustomerController extends Controller
     {
         $validated = $request->safe()->all();
         $data = (new GetCustomerAction())($validated);
+        return $data;
+    }
+
+    public function fetchAllCustomers()
+    {
+        $data = (new GetAllCustomersAction())();
         return $data;
     }
 

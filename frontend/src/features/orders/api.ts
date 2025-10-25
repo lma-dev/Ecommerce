@@ -12,7 +12,7 @@ import {
 
 // Response types
 type OrderListResponse = {
-  data: Order[]
+  data: Order[] | undefined
   meta: {
     currentPage: number
     totalPages: number
@@ -50,10 +50,7 @@ export const fetchOrders = async (
   }
 }
 
-export const useOrdersQuery = (
-  page: number,
-  filters: OrderFilters = {},
-) =>
+export const useOrdersQuery = (page: number, filters: OrderFilters = {}) =>
   useQuery({
     queryKey: ['orders', page, filters],
     queryFn: () => fetchOrders(page, filters),
@@ -98,7 +95,6 @@ export const useCreateOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
-      ToastAlert.success({ message: 'Order created successfully' })
     },
     onError: () => {
       ToastAlert.error({ message: 'Failed to create order' })

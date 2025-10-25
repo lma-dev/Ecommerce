@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum OrderStatusType: string
 {
+    case DRAFT = 'DRAFT';
     case PENDING = 'PENDING';
     case COMPLETED = 'COMPLETED';
     case CANCELLED = 'CANCELLED';
@@ -11,6 +12,7 @@ enum OrderStatusType: string
     public static function getAllStatuses(): array
     {
         return [
+            self::DRAFT,
             self::PENDING,
             self::COMPLETED,
             self::CANCELLED,

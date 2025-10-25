@@ -24,7 +24,6 @@ export default function CustomerOrderDetailPage() {
     includeGlobalChannel: false,
   })
   const { data: order, isLoading } = useCustomerOrder(id)
-  const orderNumber = order?.orderCode || id
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -37,10 +36,8 @@ export default function CustomerOrderDetailPage() {
             <span>{t('back')}</span>
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">
-          {t('orderDetailsTitle', { default: 'Order Details' })}{' '}
-          <span className="text-emerald-700">#{orderNumber}</span>
-        </h1>
+
+        <h1 className="text-2xl font-bold">{t('orderDetailsTitle')}</h1>
 
         {isLoading && <div className="text-sm text-neutral-500"> {t('loading')}</div>}
         {!isLoading && !order && (
@@ -50,12 +47,12 @@ export default function CustomerOrderDetailPage() {
         {order && (
           <div className="rounded-2xl border bg-white p-4 md:p-6 space-y-4">
             <div className="text-sm text-neutral-600 border-b border-neutral-200 pb-3">
-              {t('orderNumberLabel', { default: 'Order Number' })}{' '}
-              <span className="font-semibold text-neutral-900">#{order.orderCode || order.id}</span>
+              {t('orderNumberLabel')}
+              <span className="font-semibold text-neutral-900">#{order.orderCode}</span>
             </div>
             {order.shippingAddress ? (
               <div className="text-sm text-neutral-600">
-                {t('shippingAddress', { default: 'Shipping Address' })}:{' '}
+                {t('shippingAddress')}:{' '}
                 <span className="font-medium text-neutral-900">{order.shippingAddress}</span>
               </div>
             ) : null}

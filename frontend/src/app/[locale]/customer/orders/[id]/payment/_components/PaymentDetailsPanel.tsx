@@ -14,8 +14,12 @@ type PaymentDetailsPanelProps = {
   hasChanges: boolean
   isSaving: boolean
   hasItems: boolean
+  isPendingStatus: boolean
+  isCancelling: boolean
+  orderStatus?: string
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   onViewOrder: () => void
+  onCancel: () => void
 }
 
 export function PaymentDetailsPanel({
@@ -28,9 +32,20 @@ export function PaymentDetailsPanel({
   hasChanges,
   isSaving,
   hasItems,
+  isPendingStatus,
+  isCancelling,
+  orderStatus,
   onSubmit,
   onViewOrder,
+  onCancel,
 }: PaymentDetailsPanelProps) {
+  const normalizedStatus = (orderStatus ?? '').toUpperCase()
+  const isCancelled = normalizedStatus === 'CANCELLED'
+  const isCompleted = normalizedStatus === 'COMPLETED'
+  const canCancel = normalizedStatus !== 'CANCELLED' && normalizedStatus !== 'COMPLETED'
+  const disableProceed =
+    !hasItems || isSaving || !shippingAddress.trim() || isCancelled || isCompleted
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border bg-white p-5 md:p-6 space-y-4">
@@ -95,14 +110,47 @@ export function PaymentDetailsPanel({
             })}
           </p>
         ) : null}
-        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-          <Button type="button" variant="outline" onClick={onViewOrder}>
-            {t('viewOrder', { default: 'View Order' })}
-          </Button>
-          <Button type="submit" disabled={!hasItems || isSaving || !hasChanges}>
+        {isPendingStatus ? (
+          <p className="text-xs text-emerald-600">
+            {t('orderAlreadyPending', {
+              default: 'Your order is pending. You can update details if needed.',
+            })}
+          </p>
+        ) : null}
+        {isCancelled ? (
+          <p className="text-xs text-rose-600">
+            {t('orderAlreadyCancelled', {
+              default: 'This order has been cancelled. You can review it from the orders list.',
+            })}
+          </p>
+        ) : null}
+        {isCompleted ? (
+          <p className="text-xs text-emerald-600">
+            {t('orderAlreadyCompleted', {
+              default: 'This order has been completed. No further changes are required.',
+            })}
+          </p>
+        ) : null}
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" onClick={onViewOrder}>
+              {t('viewOrder', { default: 'View Order' })}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onCancel}
+              disabled={!canCancel || isCancelling}
+            >
+              {isCancelling
+                ? t('processing', { default: 'Processing...' })
+                : t('cancelOrder', { default: 'Cancel Order' })}
+            </Button>
+          </div>
+          <Button type="submit" disabled={disableProceed}>
             {isSaving
-              ? t('saving', { default: 'Saving...' })
-              : t('saveChanges', { default: 'Save Changes' })}
+              ? t('processing', { default: 'Processing...' })
+              : t('proceedToPayment', { default: 'Proceed' })}
           </Button>
         </div>
       </form>

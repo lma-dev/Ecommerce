@@ -6,12 +6,10 @@ import { userAccountStatusOptions } from '@/features/users/constants/status'
 export const customerSchema = createCustomerBaseSchema
   .omit({ password: true, password_confirmation: true })
   .extend({
-   id: z.number(),
-   createdAt: z.string(),
-   // Some backends expose customer account status similar to users
-   accountStatus: z
-     .enum(userAccountStatusOptions as unknown as [string, ...string[]])
-     .optional(),
-})
+    id: z.number(),
+    createdAt: z.string(),
+    // Some backends expose customer account status similar to users
+    accountStatus: z.enum(userAccountStatusOptions as unknown as [string, ...string[]]).optional(),
+  })
 
 export const customerListSchema = z.array(customerSchema)

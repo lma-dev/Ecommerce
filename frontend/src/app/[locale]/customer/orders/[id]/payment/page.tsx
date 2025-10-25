@@ -79,7 +79,11 @@ export default function CustomerOrderPaymentPage() {
   const { mutateAsync: saveOrder, isPending: isSaving } = useMutation({
     mutationFn: updateCustomerOrder,
     onSuccess: (updated) => {
-      toast.success(t('orderUpdated', { default: 'Order details saved successfully' }))
+      toast.success(
+        t('orderProceedSuccess', {
+          default: 'Order updated. We are getting it ready for payment.',
+        }),
+      )
       const normalized = formatItems(updated?.products)
       setItems(normalized)
       setShippingAddress(updated?.shippingAddress ?? '')
@@ -152,9 +156,44 @@ export default function CustomerOrderPaymentPage() {
     }
   }
 
+  const {
+    mutateAsync: cancelOrderMutation,
+    isPending: isCancelling,
+  } = useMutation({
+    mutationFn: async (orderId: number) => {
+      return updateCustomerOrder({ orderId, status: 'CANCELLED' })
+    },
+    onSuccess: (updated) => {
+      toast.success(
+        t('orderCancelSuccess', { default: 'Order cancelled successfully.' }),
+      )
+      if (updated?.id) {
+        qc.setQueryData(['customer', 'orders', updated.id], updated)
+        qc.invalidateQueries({ queryKey: ['customer', 'orders'] })
+      }
+      router.push(`/${locale}/customer/orders`)
+    },
+    onError: () => {
+      toast.error(
+        t('orderCancelFailed', {
+          default: 'Failed to cancel the order. Please try again.',
+        }),
+      )
+    },
+  })
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!order) return
+    const trimmedAddress = shippingAddress.trim()
+    if (!trimmedAddress) {
+      toast.error(
+        t('shippingAddressRequired', {
+          default: 'Please provide a shipping address before proceeding.',
+        }),
+      )
+      return
+    }
     const productIds = items.flatMap((item) => Array.from({ length: item.quantity }, () => item.id))
     if (productIds.length === 0) {
       toast.error(
@@ -166,10 +205,22 @@ export default function CustomerOrderPaymentPage() {
     }
     await saveOrder({
       orderId: order.id,
-      shippingAddress: shippingAddress.trim() || null,
+      shippingAddress: trimmedAddress,
       notes: notes.trim() || null,
       productIds,
+      status: 'PENDING',
     })
+  }
+
+  const handleCancelOrder = async () => {
+    if (!order) return
+    const confirmed = window.confirm(
+      t('confirmCancelOrder', {
+        default: 'Are you sure you want to cancel this order?',
+      }),
+    )
+    if (!confirmed) return
+    await cancelOrderMutation(order.id)
   }
 
   const goToOrderDetail = () => {
@@ -276,8 +327,12 @@ export default function CustomerOrderPaymentPage() {
                 hasChanges={hasChanges}
                 isSaving={isSaving}
                 hasItems={hasItems}
+                isPendingStatus={order?.status === 'PENDING'}
+                isCancelling={isCancelling}
+                orderStatus={order?.status}
                 onSubmit={handleSubmit}
                 onViewOrder={goToOrderDetail}
+                onCancel={handleCancelOrder}
               />
             </div>
           </div>

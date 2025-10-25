@@ -1,6 +1,7 @@
 import { PriorityStatus } from 'constants/PriorityStatus'
 import { VisibilityStatus } from 'constants/VisibilityStatus'
 import { locales, Locale } from '@/i18n/routing'
+import { ConfirmStatus } from '@/constants/ConfirmStatus'
 
 export function generateUUID() {
   let uuid = '',
@@ -103,11 +104,13 @@ export function formatCurrency(n?: number | string | null) {
 export function statusBadgeClass(status?: string) {
   const base = 'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border'
   switch ((status || '').toUpperCase()) {
-    case 'COMPLETED':
+    case ConfirmStatus.DRAFT:
+      return base + ' bg-slate-100 text-slate-600 border-slate-200'
+    case ConfirmStatus.COMPLETED:
       return base + ' bg-emerald-50 text-emerald-700 border-emerald-200'
-    case 'CANCELLED':
+    case ConfirmStatus.CANCELLED:
       return base + ' bg-rose-50 text-rose-700 border-rose-200'
-    case 'PENDING':
+    case ConfirmStatus.PENDING:
     default:
       return base + ' bg-amber-50 text-amber-700 border-amber-200'
   }

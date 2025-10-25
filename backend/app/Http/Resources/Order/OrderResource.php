@@ -23,7 +23,7 @@ class OrderResource extends JsonResource
             'notes'             => $this->notes,
             'totalAmount'      => $this->total_amount,
             'shippingAddress'  => $this->shipping_address,
-            'orderCode'        => $this->order_code,
+            'orderCode'        => $this->order_code ?? '-',
             'createdAt'       => $this->created_at?->format('Y-m-d H:i:s'),
             'updatedAt'       => $this->updated_at?->format('Y-m-d H:i:s'),
             'products'          => ProductResource::collection($this->whenLoaded('products')),

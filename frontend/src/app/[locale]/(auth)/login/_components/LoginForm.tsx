@@ -18,12 +18,14 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { env } from "@/utils/env";
+import { Loader2 } from "lucide-react";
 
 export default function LoginForm() {
   const locale = useLocale();
   const t = useTranslations("Translation");
   const version = env.APP_VERSION;
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -32,10 +34,12 @@ export default function LoginForm() {
 
   const router = useRouter();
   const { mutate, isPending, error } = useLogin();
+  const isLoading = isPending || isRedirecting;
 
   const onSubmit = (data: LoginInput) => {
     mutate(data, {
       onSuccess: () => {
+        setIsRedirecting(true);
         router.push(`/${locale}/${version}/dashboard`); // redirect after login
       },
     });
@@ -96,8 +100,11 @@ export default function LoginForm() {
           <p className="text-sm text-red-500">{t("loginFailed")}</p>
         )}
         {/* Admin login: no register link */}
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? t("loggingIn") : t("login")}
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading && (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          )}
+          {isLoading ? t("loggingIn") : t("login")}
         </Button>
         <p className="text-xs text-muted-foreground text-center">
           {t("contactAdminForAccess", { default: "Need access? Contact your administrator." })}

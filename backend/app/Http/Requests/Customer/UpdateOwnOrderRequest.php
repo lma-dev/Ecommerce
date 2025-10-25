@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Customer;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\OrderStatusType;
 
 class UpdateOwnOrderRequest extends FormRequest
 {
@@ -21,6 +23,7 @@ class UpdateOwnOrderRequest extends FormRequest
             'shippingAddress' => ['nullable', 'string', 'max:2000'],
             'productIds'      => ['sometimes', 'array', 'min:1'],
             'productIds.*'    => ['integer', 'exists:products,id'],
+            'status'          => ['sometimes', 'string', Rule::in(OrderStatusType::getAllStatuses())],
         ];
     }
 }

@@ -12,6 +12,16 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import CustomerTopbar from '../_components/CustomerTopbar'
 import { useRouter } from 'next/navigation'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export default function CustomerProfilePage() {
   const t = useTranslations('Translation')
@@ -21,23 +31,33 @@ export default function CustomerProfilePage() {
   const router = useRouter()
 
   const [form, setForm] = useState<{
-    name?: string
-    email?: string
-    phone?: string
-    address?: string | null
-  }>({})
+    name: string
+    email: string
+    phone: string
+    address: string
+  } | null>(null)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   useEffect(() => {
-    if (profile) {
-      setForm({
-        name: profile.name ?? '',
-        email: profile.email ?? '',
-        phone: profile.phone ?? '',
-        address: (profile as any).address ?? '',
-      })
-    }
+    if (!profile) return
+    setForm({
+      name: profile.name ?? '',
+      email: profile.email ?? '',
+      phone: profile.phone ?? '',
+      address: (profile as any).address ?? '',
+    })
   }, [profile])
 
+  const hydratedForm =
+    form ??
+    {
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+    }
+
   const onSubmit = async () => {
+    if (!form) return
     try {
       await update.mutateAsync(form)
       toast.success(t('updateSuccess', { default: 'Successfully updated' }))
@@ -55,6 +75,8 @@ export default function CustomerProfilePage() {
     } catch (e: any) {
       console.error(e)
       toast.error(t('deleteFailed', { default: 'Delete failed' }))
+    } finally {
+      setConfirmDeleteOpen(false)
     }
   }
 
@@ -65,7 +87,7 @@ export default function CustomerProfilePage() {
       <section className="max-w-2xl mx-auto w-full space-y-4">
         <h1 className="text-2xl font-bold">{t('profile')}</h1>
         <div className="rounded-2xl border bg-white p-4 md:p-6 space-y-4">
-          {isLoading ? (
+          {isLoading || !form ? (
             <div className="text-sm text-neutral-500">Loading...</div>
           ) : (
             <>
@@ -73,29 +95,49 @@ export default function CustomerProfilePage() {
                 <div>
                   <label className="text-sm text-neutral-700">{t('name')}</label>
                   <Input
-                    value={form.name ?? ''}
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    value={hydratedForm.name}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...(prev ?? hydratedForm),
+                        name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
                   <label className="text-sm text-neutral-700">{t('email')}</label>
                   <Input
-                    value={form.email ?? ''}
-                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    value={hydratedForm.email}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...(prev ?? hydratedForm),
+                        email: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
                   <label className="text-sm text-neutral-700">{t('phone')}</label>
                   <Input
-                    value={form.phone ?? ''}
-                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    value={hydratedForm.phone}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...(prev ?? hydratedForm),
+                        phone: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div>
                   <label className="text-sm text-neutral-700">{t('address')}</label>
                   <Input
-                    value={form.address ?? ''}
-                    onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                    value={hydratedForm.address}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...(prev ?? hydratedForm),
+                        address: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -123,7 +165,11 @@ export default function CustomerProfilePage() {
                   {t('resetAll')}
                 </Button>
                 <div className="ml-auto" />
-                <Button variant="destructive" onClick={onDelete} disabled={destroy.isPending}>
+                <Button
+                  variant="destructive"
+                  onClick={() => setConfirmDeleteOpen(true)}
+                  disabled={destroy.isPending}
+                >
                   {t('delete', { default: 'Delete' })}
                 </Button>
               </div>
@@ -131,6 +177,28 @@ export default function CustomerProfilePage() {
           )}
         </div>
       </section>
+      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('delete', { default: 'Delete' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('deleteProfileConfirmation', {
+                default: 'This will permanently remove your profile and order history. Are you sure?',
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={destroy.isPending}>
+              {t('cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete} disabled={destroy.isPending}>
+              {destroy.isPending
+                ? t('processing', { default: 'Processing...' })
+                : t('confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
