@@ -7,7 +7,7 @@ It exposes REST endpoints for the admin console and the customer storefront, han
 
 ## Architecture
 
-- **Framework:** Laravel 11 (RESTful HTTP API)
+- **Framework:** Laravel 12 (RESTful HTTP API)
 - **Pattern Highlights:** Thin controllers → application “UseCase” actions, resource transformers, form request validation, and repository‑free Eloquent models.
 - **Runtime Services:** MySQL, Laravel Horizon/queue (optional), Pusher compatible broadcaster, Cloudinary uploads proxied via the frontend.
 
