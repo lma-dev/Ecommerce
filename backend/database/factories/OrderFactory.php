@@ -5,8 +5,6 @@ namespace Database\Factories;
 use App\Enums\OrderStatusType;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\OrderStatusHistory;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +25,7 @@ class OrderFactory extends Factory
             'status'           => $this->faker->randomElement(OrderStatusType::getAllStatuses()),
             'shipping_address' => $this->faker->address(),
             'notes'            => $this->faker->optional()->sentence(),
+            'order_code'       => $this->faker->unique()->regexify('ORD-\d{6}-[A-Z0-9]{4}'),
         ];
     }
 }

@@ -2,24 +2,26 @@
 
 namespace App\Http\Requests\Customer;
 
-use App\Enums\OrderStatusType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Enums\OrderStatusType;
 
-class StoreOwnOrderRequest extends FormRequest
+class UpdateOwnOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * @return array<string, array<int, string>|string>
+     */
     public function rules(): array
     {
         return [
-            // customerId is set server-side
             'notes'           => ['nullable', 'string', 'max:1000'],
-            'shippingAddress' => ['sometimes', 'string', 'max:2000'],
-            'productIds'      => ['required', 'array', 'min:1'],
+            'shippingAddress' => ['nullable', 'string', 'max:2000'],
+            'productIds'      => ['sometimes', 'array', 'min:1'],
             'productIds.*'    => ['integer', 'exists:products,id'],
             'status'          => ['sometimes', 'string', Rule::in(OrderStatusType::getAllStatuses())],
         ];

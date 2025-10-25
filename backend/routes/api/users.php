@@ -18,6 +18,7 @@ Route::middleware('role:ADMIN,SUPER_ADMIN,STAFF')->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('categories', CategoryController::class);
+    Route::get('/all-customers', [CustomerController::class, 'fetchAllCustomers']); //this route is for dropdown users
 });
 
 Route::get('dashboard', [DashboardController::class, 'index']);

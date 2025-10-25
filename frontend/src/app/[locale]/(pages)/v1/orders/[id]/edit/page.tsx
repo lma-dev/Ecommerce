@@ -12,8 +12,8 @@ export default function OrderEditPage() {
   const { data: order, isLoading } = useOrderQuery(Number(id));
   const t = useTranslations("Translation");
 
-  if (isLoading) return <div>{t("loadingOrders", { default: "Loading orders..." })}</div>;
-  if (!order) return <div>{t("orderNotFound", { default: "Order not found" })}</div>;
+  if (isLoading) return <div>{t("loadingOrders")}</div>;
+  if (!order) return <div>{t("orderNotFound")}</div>;
 
   return (
     <div>

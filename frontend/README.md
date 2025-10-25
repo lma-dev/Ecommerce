@@ -1,60 +1,59 @@
 # 🧠 Next.js + TypeScript + Laravel API Monorepo (v1)
 
-A scalable, maintainable, and versioned frontend application using **Next.js (App Router)**, integrated with a **Laravel API backend**, supporting:
+A scalable frontend for the Yaung Kya Ml ecommerce platform. The app is built with **Next.js (App Router)** and communicates with the Laravel API for authentication, catalogue management, and realtime order updates.
 
-* 🌐 Localization (no page refresh)
-* 🧹 Modular folder structure with versioning (`v1`)
-* 🔒 Secure route middleware
-* ⚙️ API service abstraction (Laravel)
-* 🧪 Zod validation
-* 🎨 Tailwind CSS + shadcn/ui + Lucide icons
-* ⚛️ TanStack Query + Table
-* ✍️ Alias-based imports
-* 🔐 Next Auth
+- 🌐 Locale-aware routing without page refreshes.
+- 🧹 Feature/version driven folder layout (`/v1`).
+- 🔒 Middleware protected routes (customer vs. console).
+- ⚙️ Dedicated API client abstraction + TanStack Query caching.
+- 🧪 Zod validation for forms and server payloads.
+- 🎨 Tailwind CSS + shadcn/ui + Lucide icons.
+- 📡 Realtime updates via Pusher + Laravel Echo bridge.
+- ✍️ Typesafe alias-based imports.
 
 ---
+
+## 🧱 Architecture Definition
+
+- **Framework:** Next.js 14 App Router (React Server Components hybrid).
+- **State / Data:** TanStack Query for API data, Zustand for light client state, React Context for auth/session.
+- **Data Flow:** REST requests via Axios → Laravel API. Subscriptions handled with Laravel Echo (Pusher transport).
+- **Rendering:** Locale segmented layouts under `app/[locale]`, leveraging Next.js nested routing and streaming.
+- **Validation:** Zod schemas shared between forms and API response guards.
+
+## 🧩 Design Patterns
+
+- **Feature Modules:** Each `app/[locale]/(pages)/v1/<feature>` directory encapsulates UI, hooks, schemas, and translations for that feature.
+- **Hooks as Composition Units:** `useRealtimeOrders`, `useCustomerOrders`, etc. abstract side-effects and caching.
+- **UI Composition:** shadcn/ui primitives wrapped into domain-specific components (e.g. `OrderTable`, `ConfirmDialog`).
+- **Service Layer:** API methods live under `src/features/*/api.ts` to centralise HTTP calls and response parsing.
 
 ## 📁 Folder Structure (v1)
 
-````
+```
 public/
 src/
 ├── app/
-│   ├── [locale]/(pages)/v1/       # Localized versioned route pages
-│   │   ├── dashboard/              # Example feature folder
-│   │   └── login/                  # Login feature folder
-│   ├── layout.tsx                  # Root layout
-│   ├── page.tsx                    # Redirect entry point
-│   └── favicon.ico                 # App icon
-├── _components/                   # Shared UI components
-├── _enums/                        # Centralized enums
-├── _hooks/                        # Custom React hooks
-├── _libs/                         # Utilities (axios, helpers, etc.)
-├── _locales/                      # i18n JSON files (en.json, ja.json, etc.)
-├── _middleware/                   # Middleware logic (auth, i18n, roles)
-├── _schemas/                      # Zod schemas (validation)
-├── _services/                     # API service layer (Laravel endpoints)
-├── _storybook/                    # Storybook setup
-├── _styles/                       # Tailwind config and global styles
-├── _utils/                        # Utility functions/helpers
-├── stories/                       # Storybook stories
-├── types/                         # Global TypeScript types
-├── example.ts                     # Example utility or config
+│   ├── [locale]/
+│   │   ├── (pages)/v1/            # Versioned, localized routes (admin + customer)
+│   │   └── layout.tsx             # Locale-aware root layout
+│   ├── api/                       # Next.js route handlers (proxy/auth helpers)
+│   └── layout.tsx                 # Global root layout
+├── components/ui/                 # Shadcn based primitives
+├── features/                      # Domain slices (orders, customers, products, etc.)
+│   ├── api.ts                     # REST calls + zod parsing
+│   ├── schemas/                   # Input/output validation
+│   └── hooks/                     # Feature specific hooks
+├── libs/                          # Cross-cutting utilities (axios, echo, auth, assets)
+├── messages/                      # i18n dictionaries (en/jp/mm)
+├── constants/                     # Shared enums/constants
+├── styles/                        # Tailwind & global styles
+└── types/                         # Shared TypeScript types
 .env.example
-.gitignore
-README.md
-next-env.d.ts
 next.config.ts
-package-lock.json
-package.json
 pnpm-lock.yaml
-postcss.config.mjs
-tsconfig.json```
-
-
----
-
-## ⚙️ Tech Stack
+tsconfig.json
+```
 
 | Area            | Stack                                                                          |
 | --------------- | ------------------------------------------------------------------------------ |
@@ -71,6 +70,21 @@ tsconfig.json```
 | Versioning      | URL-based (`/v1`) route versioning                                             |
 | Alias Imports   | TypeScript path aliases (`@components`, `@lib`, etc.)                          |
 | Storybook       | (optional) Component-driven dev                                                |
+
+---
+
+## 🔌 Third-Party Services & Libraries
+
+- **Pusher** – Realtime order updates through Laravel Echo  
+  https://pusher.com/
+- **Cloudinary** – Image upload & optimisation for catalogue assets  
+  https://cloudinary.com/
+- **next-intl** – Internationalisation with locale-prefixed routes  
+  https://next-intl-docs.vercel.app/
+- **sonner** – Toast notifications for UX feedback  
+  https://sonner.emilkowal.ski/
+- **shadcn/ui** – Accessible UI primitives built on Radix  
+  https://ui.shadcn.com/
 
 ---
 
@@ -105,7 +119,7 @@ The container runs `pnpm start`, so it serves the pre-built app on port `3000`.
 
 ## 🔐 Auth & Middleware
 
-* **Next Auth**: Manages sessions, tokens, and user states.
+* **Next Auth**: Manages sessions, tokens, and user states (customer + console modes).
 * **`middleware.ts`**: Handles route protection and locale redirection.
 * Extendable with role-based guards inside `src/app/_middleware/`.
 
@@ -164,10 +178,11 @@ src/app/[locale]/v2/    ← Future version
 
 ## ✅ To-Do
 
-* [ ] Add CI/CD GitHub Actions
-* [ ] Add testing setup (Vitest or Playwright)
-* [ ] Add dark mode toggle
-* [ ] Optimize bundle with custom webpack rules (optional)
+* [ ] Add CI/CD GitHub Actions.
+* [ ] Introduce automated UI testing (Playwright).
+* [ ] Implement dark mode toggle with persisted preference.
+* [ ] Document realtime event channel contracts.
+* [ ] Add story coverage for key shadcn-based components.
 
 ---
 

@@ -12,7 +12,7 @@ export default function ProductEditPage() {
   const t = useTranslations("Translation");
 
   if (isLoading) return <div>{t("loadingProducts")}</div>;
-  if (!product) return <div>{t("productNotFound", { default: "Product not found" })}</div>;
+  if (!product) return <div>{t("productNotFound")}</div>;
 
   return (
     <div>

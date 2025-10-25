@@ -32,10 +32,10 @@ export const createUserColumns = (
           : "bg-slate-100 text-slate-700 border-slate-200";
       const label =
         role === "SUPER_ADMIN"
-          ? t("superAdmin", { default: "Super Admin" })
+          ? t("superAdmin")
           : role === "ADMIN"
-          ? t("admin", { default: "Admin" })
-          : t("staff", { default: "Staff" });
+          ? t("admin")
+          : t("staff");
       return (
         <Badge className={cls} variant="secondary">
           {label}

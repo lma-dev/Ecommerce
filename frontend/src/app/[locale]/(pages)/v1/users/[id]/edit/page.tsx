@@ -12,9 +12,9 @@ export default function UserEditPage() {
   const { data: user, isLoading } = useUserQuery(numericId);
   const t = useTranslations("Translation");
 
-  if (!Number.isFinite(numericId)) return <div>{t("userNotFound", { default: "User not found" })}</div>;
+  if (!Number.isFinite(numericId)) return <div>{t("userNotFound")}</div>;
   if (isLoading) return <div>{t("loadingUsers")}</div>;
-  if (!user) return <div>{t("userNotFound", { default: "User not found" })}</div>;
+  if (!user) return <div>{t("userNotFound")}</div>;
 
   return (
     <div>

@@ -21,7 +21,7 @@ class ProductFactory extends Factory
     {
         // Curated mini shop item names grouped by rough category
         $itemsByCategory = [
-            'Beverages' => [
+            'Drinks' => [
                 'Myanmar Tea Mix',
                 'Coffee 3-in-1',
                 'Milo Pack',
@@ -36,44 +36,33 @@ class ProductFactory extends Factory
                 'Chocolate Bar',
                 'Peanut Snacks'
             ],
-            'Staples' => [
-                'Premium Rice 1kg',
-                'Cooking Oil 1L',
-                'Sugar 1kg',
-                'Iodized Salt 500g',
-                'Wheat Flour 1kg'
+            'Fruits' => [
+                'Fresh Apples 1kg',
+                'Bananas 1kg',
+                'Oranges 1kg',
+                'Grapes 1kg',
+                'Mangoes 1kg'
             ],
-            'Canned & Instant' => [
-                'Instant Noodles',
-                'Canned Tuna',
-                'Canned Beans',
-                'Tomato Paste',
-                'Curry Paste Sachet'
+            'Meats' => [
+                'Chicken Breast 1kg',
+                'Ground Beef 1kg',
+                'Pork Chops 1kg',
+                'Bacon 200g',
+                'Sausages 500g'
             ],
-            'Dairy & Eggs' => [
-                'Fresh Milk 1L',
-                'Condensed Milk',
-                'Cheddar Cheese',
-                'Salted Butter'
+            'Tea' => [
+                'Green Tea Bags',
+                'Black Tea Loose Leaf',
+                'Herbal Tea Variety Pack',
+                'Oolong Tea 100g',
+                'Chamomile Tea 50g'
             ],
             'Bakery' => [
                 'White Bread Loaf',
                 'Sweet Buns',
                 'Crackers Pack'
             ],
-            'Household' => [
-                'Laundry Detergent',
-                'Dishwashing Liquid',
-                'Garbage Bags',
-                'Toilet Paper 10s'
-            ],
-            'Personal Care' => [
-                'Shampoo 200ml',
-                'Bath Soap',
-                'Toothpaste 140g',
-                'Toothbrush',
-                'Face Tissue Pack'
-            ],
+
         ];
 
         // Decide category name and ensure FK exists
@@ -82,10 +71,8 @@ class ProductFactory extends Factory
             'description' => $this->faker->sentence(),
         ]);
 
-        // Do not use unique() on small pools; handle uniqueness manually
         $baseName = $this->faker->randomElement($itemsByCategory[$categoryName]);
 
-        // Always decorate the base name with a short random suffix to dodge the unique constraint.
         do {
             $suffix = Str::upper(Str::random(3)) . $this->faker->numerify('##');
             $name = $baseName . ' ' . $suffix;
@@ -93,10 +80,8 @@ class ProductFactory extends Factory
 
         return [
             'name'        => $name,
-            // Price in kyat (unsigned integer column). Keep realistic ranges.
             'price'       => $this->faker->numberBetween(300, 15000),
             'category_id' => $category->id,
-            // DB uses enum strings 'ACTIVE'|'INACTIVE'
             'is_active'   => $this->faker->boolean(85) ? 'ACTIVE' : 'INACTIVE',
             'description' => $this->faker->optional()->sentence(),
         ];

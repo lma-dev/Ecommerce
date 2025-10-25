@@ -36,6 +36,7 @@ RUN apk add --no-cache \
         openssl \
         mysql-client \
         supervisor \
+        unzip \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         icu-dev \

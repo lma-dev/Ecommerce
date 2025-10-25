@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Customer;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,6 +17,7 @@ class CustomerSeeder extends Seeder
         Customer::insert([
             'name' => 'Customer One',
             'email' => 'customer1@gmail.com',
+            'phone' => '1234567890',
             'email_verified_at' => now(),
             'password' =>  Hash::make('12345678'),
             'remember_token' => Str::random(10),
@@ -26,6 +26,7 @@ class CustomerSeeder extends Seeder
         Customer::insert([
             'name' => 'Customer Two',
             'email' => 'customer2@gmail.com',
+            'phone' => '1234567890',
             'email_verified_at' => now(),
             'password' =>  Hash::make('12345678'),
             'remember_token' => Str::random(10),

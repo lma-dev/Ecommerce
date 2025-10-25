@@ -1,8 +1,3 @@
-export const orderStatusOptions = [
-  'PENDING',
-  'CANCELLED',
-  'COMPLETED',
-] as const
+export const orderStatusOptions = ['DRAFT', 'PENDING', 'CANCELLED', 'COMPLETED'] as const
 
-export type OrderStatusType = typeof orderStatusOptions[number]
-
+export type OrderStatusType = (typeof orderStatusOptions)[number]

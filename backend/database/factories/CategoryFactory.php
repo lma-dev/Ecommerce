@@ -16,22 +16,8 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $names = [
-            'Beverages',
-            'Snacks',
-            'Staples',
-            'Canned & Instant',
-            'Dairy & Eggs',
-            'Bakery',
-            'Household',
-            'Personal Care',
-        ];
-
-        // Avoid using unique() over a small fixed pool to prevent exhaustion
-        $name = $this->faker->randomElement($names);
-
         return [
-            'name' => $name,
+            'name' => $this->faker->unique()->words(2, true),
             'description' => $this->faker->sentence(),
         ];
     }

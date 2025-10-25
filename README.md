@@ -58,6 +58,32 @@ pnpm lint
 
 ## 5. Troubleshooting checklist
 
+```bash
+# Restart only the backend service
+docker compose restart backend
+
+# Run if you change code or dependencies
+docker compose up --build -d backend
+
+# Run if you want to restart full (backend + frontend)
+docker compose down && docker compose up --build
+
+# delete mysql of docker
+docker volume rm $(docker volume ls -q)
+
+# Stop and remove all containers
+docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+
+# Remove all unused Docker resources (containers, images, networks, volumes)
+docker system prune -a --volumes
+
+# Optional: remove all volumes only
+docker volume prune -f
+
+# Optional: remove all networks only
+docker network prune -f
+```
+
 - `.env` files match the documented values (APP_URL, SESSION_*, SANCTUM_STATEFUL_DOMAINS, FRONTEND_URL)
 - Docker containers are healthy (`docker compose ps`)
 - Browser cookies for `localhost` are cleared after cache refreshes

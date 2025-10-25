@@ -57,3 +57,27 @@ coverage/
 turbo/
 
 *storybook.log
+
+# 🐳 Docker core files (keep these tracked)
+!Dockerfile
+!docker-compose.yml
+!docker-compose.yaml
+!docker-compose.dev.yml
+!docker-compose.prod.yml
+
+# 🧱 Docker cache and build artifacts (ignore these)
+.docker/
+docker-data/
+docker-cache/
+**/.docker/
+**/docker-cache/
+**/docker-data/
+**/tmp/
+**/cache/
+**/logs/
+
+# Ignore Docker layer hashes and intermediate files
+**/sha256:*
+**/layer.tar
+**/manifest.json
+**/repositories

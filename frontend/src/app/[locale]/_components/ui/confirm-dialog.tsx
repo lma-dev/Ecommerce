@@ -66,9 +66,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={handleCancel}>
-              {t("cancel") ?? "Cancel"}
+              {t("cancel")}
             </Button>
-            <Button onClick={handleConfirm}>{t("confirm") ?? "Confirm"}</Button>
+            <Button onClick={handleConfirm}>{t("confirm")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

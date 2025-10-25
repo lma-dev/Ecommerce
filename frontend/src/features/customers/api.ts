@@ -67,6 +67,19 @@ export const useCustomersQuery = (page: number, filters: CustomerFilters = {}) =
     staleTime: 30_000,
   })
 
+export const useAllCustomersQuery = () => {
+  return useQuery({
+    queryKey: ['all-customers'],
+    queryFn: async () => {
+      const res = await fetchAllData('/all-customers')
+      return res
+    },
+    staleTime: 5 * 60_000, // cache for 5 minutes
+    refetchInterval: 10 * 60_000, // refresh every 10 minutes
+    refetchIntervalInBackground: true,
+  })
+}
+
 // GET by ID
 export const fetchCustomer = async (id: number): Promise<Customer> => {
   const res = await fetchSingleData<{ data: unknown }>(`/customers/${id}`)

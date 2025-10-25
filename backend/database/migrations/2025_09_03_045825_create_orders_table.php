@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->unsignedBigInteger('total_amount');
-            $table->enum('status', ['PENDING', 'COMPLETED', 'CANCELLED'])->default('PENDING');
+            $table->enum('status', ['DRAFT', 'PENDING', 'COMPLETED', 'CANCELLED'])->default('DRAFT');
             $table->text('shipping_address')->nullable();
             $table->text('notes')->nullable();
             $table->softDeletes();

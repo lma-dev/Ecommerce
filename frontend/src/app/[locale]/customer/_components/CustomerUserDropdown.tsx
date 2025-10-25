@@ -53,12 +53,12 @@ export function CustomerUserDropdown() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={{ pathname: "/about" }}>
-              <Info className="mr-2 h-4 w-4" /> {t("about", { default: "About" })}
+              <Info className="mr-2 h-4 w-4" /> {t("about")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href={{ pathname: "/contact" }}>
-              <Phone className="mr-2 h-4 w-4" /> {t("contact", { default: "Contact" })}
+              <Phone className="mr-2 h-4 w-4" /> {t("contact")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

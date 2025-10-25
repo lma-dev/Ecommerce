@@ -59,7 +59,7 @@ export default function ConsoleProfilePage() {
         )}
         <div className="mt-6 flex gap-3">
           <Link href={`/${locale}/v1/users/${id}/edit`}>
-            <Button>{t('updateUser', { default: 'Update User' })}</Button>
+            <Button>{t('updateUser')}</Button>
           </Link>
           <Link href={`/${locale}/v1/dashboard`}>
             <Button variant="outline">{t('back')}</Button>

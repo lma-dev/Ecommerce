@@ -27,7 +27,7 @@ export default function DashboardStatGrid({
     {
       label: t("completedOrdersTotal"),
       value: data ? cf.format(data.completedOrdersTotalAmount) : "-",
-      hint: t("sinceLastUpdate", { default: t("timeLastWeek") }),
+      hint: t("sinceLastUpdate"),
       icon: CircleDollarSign,
       iconBg: "bg-emerald-100 text-emerald-700",
     },

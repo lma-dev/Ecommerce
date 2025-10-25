@@ -29,15 +29,17 @@ const orderProductSchema = z.object({
         bytes: z.number(),
       }),
     ])
-    .optional(),
+    .optional()
+    .nullable(),
 })
 
 export const orderSchema = z.object({
   id: z.number(),
   // Some single-order responses may omit customer
   customer: orderCustomerSchema.optional().nullable(),
-  status: z.enum(orderStatusOptions),
+  status: z.enum(orderStatusOptions).default('DRAFT'),
   notes: z.string().nullable().optional(),
+  orderCode: z.string().nullable().optional(),
   totalAmount: z.number(),
   total: z.number().optional(),
   shippingAddress: z.string().nullable().optional(),

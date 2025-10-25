@@ -12,7 +12,7 @@ export default function CategoryEditPage() {
   const t = useTranslations("Translation");
 
   if (isLoading) return <div>{t("loadingCategories")}</div>;
-  if (!category) return <div>{t("categoryNotFound", { default: "Category not found" })}</div>;
+  if (!category) return <div>{t("categoryNotFound")}</div>;
 
   return (
     <div>

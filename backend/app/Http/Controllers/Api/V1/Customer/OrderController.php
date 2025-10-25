@@ -11,6 +11,8 @@ use App\UseCases\Order\DetailOrderAction;
 use App\UseCases\Order\GetOrderAction;
 use App\UseCases\Order\StoreOrderAction;
 use App\Http\Requests\Customer\StoreOwnOrderRequest;
+use App\Http\Requests\Customer\UpdateOwnOrderRequest;
+use App\UseCases\Order\UpdateOrderAction;
 
 class OrderController extends Controller
 {
@@ -38,5 +40,22 @@ class OrderController extends Controller
         $validated['customerId'] = getAuthCustomerOrFailed()->id;
         $order = (new StoreOrderAction())($validated);
         return ResponseHelper::success('Order created successfully', new OrderResource($order->load(['products'])), 201);
+    }
+
+    /** PATCH /customer/orders/{order} */
+    public function update(UpdateOwnOrderRequest $request, Order $order)
+    {
+        $customerId = getAuthCustomerOrFailed()->id;
+        abort_unless($order->customer_id === $customerId, 404);
+
+        $validated = $request->validated();
+        $validated['customerId'] = $customerId;
+
+        $updated = (new UpdateOrderAction())($order, $validated);
+
+        return ResponseHelper::success(
+            'Order updated successfully',
+            new OrderResource($updated->load(['products']))
+        );
     }
 }

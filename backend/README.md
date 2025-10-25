@@ -1,74 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Backend Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
 
-## About Laravel
+This directory hosts the Laravel API that powers the ecommerce experience.  
+It exposes REST endpoints for the admin console and the customer storefront, handles authentication, and dispatches real‑time order events through broadcasting channels.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Architecture
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Framework:** Laravel 11 (RESTful HTTP API)
+- **Pattern Highlights:** Thin controllers → application “UseCase” actions, resource transformers, form request validation, and repository‑free Eloquent models.
+- **Runtime Services:** MySQL, Laravel Horizon/queue (optional), Pusher compatible broadcaster, Cloudinary uploads proxied via the frontend.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Design Patterns
 
-## Local Development with Docker
+- **Command/Action classes:** `App\UseCases\*` encapsulate business operations (Create/Update/Delete Order, etc.).
+- **Form Request validation:** `App\Http\Requests\*` centralise validation and authorization rules.
+- **Resource Transformers:** `App\Http\Resources\*` shape API payloads consumed by the Next.js frontend.
+- **Helper Facades:** `App\Helpers\ResponseHelper` standardises API envelopes and metadata.
 
-This project ships with a Docker environment for PHP-FPM, Nginx, and MySQL.
+## Folder Structure
 
-1. Copy `.env.example` to `.env` and adjust any values you need. Ensure `MYSQL_ROOT_PASSWORD` matches the MySQL credentials the app will use.
-2. Build the containers: `docker compose build`.
-3. Install dependencies: `docker compose run --rm app composer install`.
-4. Generate the application key: `docker compose run --rm app php artisan key:generate`.
-5. Start the stack: `docker compose up -d`.
-6. Run database migrations: `docker compose exec app php artisan migrate`.
+```
+app/
+├── Helpers/              # Shared helpers (API responses, formatting)
+├── Http/
+│   ├── Controllers/      # Route controllers for Admin & Customer APIs
+│   ├── Middleware/
+│   ├── Requests/         # Form requests used for validation/authorisation
+│   └── Resources/        # JSON resources returned to the frontend
+├── Models/               # Eloquent models and relationships
+├── UseCases/             # Application actions / command classes
+config/                   # Environment specific configuration
+database/
+├── factories/            # Model factories for tests/seeders
+├── migrations/           # Schema definition
+└── seeders/              # Database seeders
+routes/
+├── api/                  # Versioned API routes (admin/customer)
+└── console.php           # Artisan commands
+tests/
+├── Feature/              # HTTP/API feature tests
+└── Unit/                 # (reserved for pure unit tests)
+```
 
-The API will be available at `http://localhost:8000`. A queue worker is automatically provisioned (`queue` service). To tail logs or run ad-hoc commands use `docker compose exec app <command>`.
+## Third-Party Services & Libraries
 
-## Learning Laravel
+- **Pusher** – WebSocket broadcasting for order updates  
+  https://pusher.com/
+- **Laravel Echo** – JavaScript client consumed by the frontend for realtime events  
+  https://laravel.com/docs/broadcasting#client
+- **Cloudinary** – Media storage & image transformations (uploads initiated from the frontend)  
+  https://cloudinary.com/
+- **Laravel Sanctum** – API token & SPA authentication  
+  https://laravel.com/docs/sanctum
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Local Development
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Using Docker
 
-## Laravel Sponsors
+```bash
+docker compose up -d
+docker compose exec backend php artisan migrate --seed
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+API base URL: `http://localhost:8000`
 
-### Premium Partners
+## Testing
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+php artisan test
+```
 
-## Contributing
+Useful targeted runs:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `php artisan test --filter=CatalogTest`
+- `php artisan test --filter=OrdersTest`
 
-## Code of Conduct
+## To-Do
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- [ ] Harden broadcast events with integration tests.
+- [ ] Add API rate limiting policies per client type.
+- [ ] Document Horizon/queue deployment recommendations.
+- [ ] Expand seeder coverage for catalogue/product imagery.

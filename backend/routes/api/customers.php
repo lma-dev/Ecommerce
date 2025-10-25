@@ -19,6 +19,7 @@ Route::get('products/{product}', [CustomerProductController::class, 'show']);
 Route::get('orders', [CustomerOrderController::class, 'index']);
 Route::get('orders/{order}', [CustomerOrderController::class, 'show']);
 Route::post('orders', [CustomerOrderController::class, 'store']);
+Route::patch('orders/{order}', [CustomerOrderController::class, 'update']);
 
 // Profile
 Route::get('me', [ProfileController::class, 'show']);

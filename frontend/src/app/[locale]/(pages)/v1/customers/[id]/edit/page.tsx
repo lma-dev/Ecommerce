@@ -12,7 +12,7 @@ export default function CustomerEditPage() {
   const t = useTranslations("Translation");
 
   if (isLoading) return <div>{t("loadingCustomers")}</div>;
-  if (!customer) return <div>{t("customerNotFound", { default: "Customer not found" })}</div>;
+  if (!customer) return <div>{t("customerNotFound")}</div>;
 
   return (
     <div>

@@ -106,7 +106,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ showDialog, t }) => {
             onValueChange={(val) => setStatusFilter(val as StatusSelectValue)}
           >
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder={t("filterByStatus", { default: "Filter by status" })} />
+              <SelectValue placeholder={t("filterByStatus")} />
             </SelectTrigger>
 
             <SelectContent>

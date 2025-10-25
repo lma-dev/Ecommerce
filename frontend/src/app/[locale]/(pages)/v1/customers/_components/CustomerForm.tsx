@@ -86,7 +86,7 @@ const CustomerForm = ({
           <div className="relative">
             <Input
               type={showPassword2 ? "text" : "password"}
-              placeholder={t("confirmPassword", { default: "Confirm Password" })}
+              placeholder={t("confirmPassword")}
               autoComplete="new-password"
               {...form.register("password_confirmation")}
             />

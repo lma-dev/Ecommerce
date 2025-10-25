@@ -10,35 +10,48 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class GetOrderAction
 {
+    /**
+     * Fetch orders depending on role context.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  int|null  $scopedCustomerId
+     */
     public function __invoke(array $data, ?int $scopedCustomerId = null): JsonResponse
     {
-
-        $data = $this->OrderFilter($data, $scopedCustomerId);
-        $meta = ResponseHelper::getPaginationMeta($data);
+        $orders = $this->filterOrders($data, $scopedCustomerId);
+        $meta = ResponseHelper::getPaginationMeta($orders);
 
         return response()->json([
-            'data' => OrderResource::collection($data),
+            'data' => OrderResource::collection($orders),
             'meta' => $meta,
         ]);
     }
 
-    private function OrderFilter(array $validatedData, ?int $scopedCustomerId = null): LengthAwarePaginator
+    /**
+     * Filter logic: admin sees all orders, customer sees only non-draft.
+     */
+    private function filterOrders(array $validatedData, ?int $scopedCustomerId = null): LengthAwarePaginator
     {
         $limit      = (int) ($validatedData['limit'] ?? 8);
         $page       = (int) ($validatedData['page'] ?? 1);
         $status     = $validatedData['status'] ?? null;
-        // If a scoped ID is provided (e.g., customer context), it overrides input
-        $customerId = $scopedCustomerId ?? ($validatedData['customerId'] ?? null);
 
-        $data = Order::query()
+        $query = Order::query()
             ->with(['customer', 'products'])
             ->whereNull('deleted_at')
-            ->when($status, fn($q, $r) => $q->where('status', $r))
-            ->when($customerId, fn($q, $st) => $q->where('customer_id', (int) $st))
-            ->latest('created_at')
-            ->paginate($limit, ['*'], 'page', $page)
-            ->withQueryString();
+            ->latest('created_at');
 
-        return $data;
+        //  For customers
+        if ($scopedCustomerId) {
+            $query->where('customer_id', $scopedCustomerId)
+                ->where('status', '!=', 'DRAFT'); // exclude draft orders
+        }
+
+        //  For admin (no customer_id filter)
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->paginate($limit, ['*'], 'page', $page)->withQueryString();
     }
 }
