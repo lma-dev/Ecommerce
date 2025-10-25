@@ -24,8 +24,13 @@ class OrdersTest extends TestCase
     {
         $customer = $this->actingAsCustomer();
         // Create orders for this and another customer
-        Order::factory()->create(['customer_id' => $customer->id]);
-        Order::factory()->create();
+        Order::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'PENDING',
+        ]);
+        Order::factory()->create([
+            'status' => 'PENDING',
+        ]);
 
         $res = $this->getJson('/api/customer/orders');
         $res->assertOk();
