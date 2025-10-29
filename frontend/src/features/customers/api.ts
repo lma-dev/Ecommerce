@@ -68,11 +68,11 @@ export const useCustomersQuery = (page: number, filters: CustomerFilters = {}) =
   })
 
 export const useAllCustomersQuery = () => {
-  return useQuery({
+  return useQuery<Customer[]>({
     queryKey: ['all-customers'],
     queryFn: async () => {
-      const res = await fetchAllData('/all-customers')
-      return res
+      const res = await fetchAllData<{ data?: Customer[] }>('/all-customers')
+      return Array.isArray(res?.data) ? res.data : []
     },
     staleTime: 5 * 60_000, // cache for 5 minutes
     refetchInterval: 10 * 60_000, // refresh every 10 minutes

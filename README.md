@@ -54,6 +54,10 @@ docker compose exec backend php artisan migrate:fresh --seed
 # Lint (from frontend directory)
 pnpm lint
 
+# Run build & surface TypeScript errors inside Docker
+docker compose run --rm frontend \
+  sh -c "corepack enable pnpm && pnpm install --config.allow-build=* && pnpm run build"
+
 ```
 
 ## 5. Troubleshooting checklist
@@ -98,4 +102,3 @@ Use this file as the single source of truth for the commands you need during loc
 - password - 12345678
 
 ```
-

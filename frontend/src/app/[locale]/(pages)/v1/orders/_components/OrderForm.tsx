@@ -79,7 +79,7 @@ const OrderForm = ({ mode, defaultValues }: { mode: 'create' | 'edit'; defaultVa
 
   // 🧩 Customers
   const { data: customersRes, isLoading: isLoadingCustomers } = useAllCustomersQuery()
-  const customers = customersRes?.data ?? []
+  const customers = customersRes ?? []
 
   // Merge in default customer if not already in the list
   const allCustomers: Customer[] = useMemo(() => {
