@@ -1,0 +1,7 @@
+# Docker cache and build artifacts
+.docker/
+docker-cache/
+docker-data/
+**/.docker/
+**/docker-cache/
+**/docker-data/

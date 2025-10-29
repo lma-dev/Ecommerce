@@ -82,6 +82,7 @@ export function formatDate(
     const d = date instanceof Date ? date : new Date(date)
     return new Intl.DateTimeFormat(locale, options).format(d)
   } catch (err) {
+    console.error('Error formatting date:', err)
     console.error('Invalid date format:', date)
     return ''
   }
