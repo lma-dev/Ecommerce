@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\AccountStatusType;
 use App\Enums\UserRoleType;
-
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -18,7 +18,10 @@ class ProductsTest extends TestCase
 
     private function actingAsAdmin(): User
     {
-        $user = User::factory()->create(['role' => UserRoleType::ADMIN->value]);
+        $user = User::factory()->create([
+            'role' => UserRoleType::ADMIN->value,
+            'account_status' => AccountStatusType::ACTIVE->value,
+        ]);
         Sanctum::actingAs($user);
         return $user;
     }

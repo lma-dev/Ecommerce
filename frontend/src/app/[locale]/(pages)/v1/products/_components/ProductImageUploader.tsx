@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, type ChangeEvent, type Ref } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/jpg,image/gif,image/svg+xml";
 
@@ -44,10 +43,6 @@ export default function ProductImageUploader({
     onChange(file);
   };
 
-  const handleClear = () => {
-    onChange(null);
-  };
-
   return (
     <div className="space-y-2">
       {previewUrl && (
@@ -67,11 +62,6 @@ export default function ProductImageUploader({
         onChange={handleFileChange}
         ref={inputRef}
       />
-      {(value || (previewUrl && previewUrl === objectUrl)) && (
-        <Button type="button" variant="outline" onClick={handleClear}>
-          Remove image
-        </Button>
-      )}
     </div>
   );
 }

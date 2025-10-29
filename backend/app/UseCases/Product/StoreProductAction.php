@@ -2,6 +2,7 @@
 
 namespace App\UseCases\Product;
 
+use App\Enums\VisibilityStatusType;
 use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +26,8 @@ class StoreProductAction
                 'name'        => $data['name'],
                 'price'       => $data['price'],
                 'category_id' => $data['categoryId'],
-                'is_active'   => $data['isActive'],
-                'description' => $data['description'],
+                'is_active'   => data_get($data, 'isActive', VisibilityStatusType::ACTIVE->value),
+                'description' => data_get($data, 'description'),
                 'image_id'    => $image->id,
             ]);
 

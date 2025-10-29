@@ -43,8 +43,8 @@ class GetOrderAction
 
         //  For customers
         if ($scopedCustomerId) {
-            $query->where('customer_id', $scopedCustomerId)
-                ->where('status', '!=', 'DRAFT'); // exclude draft orders
+            $query->where('customer_id', $scopedCustomerId);
+            // ->where('status', '!=', 'DRAFT'); // exclude draft orders
         }
 
         //  For admin (no customer_id filter)

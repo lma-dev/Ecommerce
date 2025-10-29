@@ -15,7 +15,11 @@ class StoreOrderAction
         return DB::transaction(function () use ($data) {
             $productIds = $data['productIds'] ?? [];
             $customerId = $data['customerId'] ?? null;
-            $status = $data['status'] ?? OrderStatusType::DRAFT;
+            $statusInput = $data['status'] ?? OrderStatusType::DRAFT->value;
+            if ($statusInput instanceof OrderStatusType) {
+                $statusInput = $statusInput->value;
+            }
+            $status = is_string($statusInput) ? $statusInput : OrderStatusType::DRAFT->value;
             $notes = $data['notes'] ?? null;
             $shippingAddress = $data['shippingAddress'] ?? null;
             $orderCode = uuidGenerator();

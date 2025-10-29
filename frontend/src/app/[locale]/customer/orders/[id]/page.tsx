@@ -50,6 +50,13 @@ export default function CustomerOrderDetailPage() {
               {t('orderNumberLabel')}
               <span className="font-semibold text-neutral-900">#{order.orderCode}</span>
             </div>
+            {((order.status ?? '') as string).toUpperCase() === 'DRAFT' && (
+              <div className="flex justify-end">
+                <Link href={{ pathname: `/customer/orders/${order.id}/payment` }}>
+                  <Button size="sm">{t('proceedToPayment')}</Button>
+                </Link>
+              </div>
+            )}
             {order.shippingAddress ? (
               <div className="text-sm text-neutral-600">
                 {t('shippingAddress')}:{' '}
