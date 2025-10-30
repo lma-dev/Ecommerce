@@ -5,23 +5,29 @@ This project runs a Laravel 12 backend and a Next.js frontend side by side via D
 ## 1. Boot the stack
 
 ```bash
-# Run to start all services (backend and frontend)
-docker compose up --build
+# Start API, frontend, Reverb, and MySQL containers (detached)
+docker compose up -d --build backend frontend reverb mysql
 
-# Run outstanding migrations
+# Tail logs (optional)
+docker compose logs -f backend
+
+# Run outstanding migrations (once services are healthy)
 docker compose exec backend php artisan migrate
 
 # Manually seed a specific class
 docker compose exec backend php artisan db:seed
 
-# Need to run queue worker for mail sending and realtime order system
-docker compose exec backend php artisan queue:work
+# run realtime websockets (runs inside the backend container)
+docker compose exec backend php artisan reverb:start
 
+# Kick off a queue worker (runs inside the backend container)
+docker compose exec backend php artisan queue:work
 ```
 
-- Backend is exposed on `http://localhost:8000`
-- Frontend dev server is on `http://localhost:3000`
-- MySQL 8 listens on `localhost:3306`
+- Backend API: `http://localhost:8000`
+- Frontend dev server: `http://localhost:3000`
+- Reverb websockets: `ws://localhost:6001` (proxied via `ws.<domain>` when using Nginx)
+- MySQL 8: `localhost:3306`
 
 - Console Login 
 `http://localhost:3000/en/login?type=console`
@@ -30,12 +36,11 @@ docker compose exec backend php artisan queue:work
 `http://localhost:3000/en`
 
 
-Stop everything with `CTRL+C` or `docker compose down`.
+Stop everything with `docker compose down` (add `-v` to drop volumes).
 
 ## 2. For Testing Backend
 
 ```bash
-# Run backend test suite
 docker compose exec backend php artisan test
 ```
 
@@ -44,7 +49,6 @@ docker compose exec backend php artisan test
 Database seeds live in `backend/database/seeders`. The default `DatabaseSeeder` wires every child seeder (users, categories, etc.).
 
 ```bash
-# To fresh database + seed everything in DatabaseSeeder
 docker compose exec backend php artisan migrate:fresh --seed
 ```
 
@@ -63,29 +67,13 @@ docker compose run --rm frontend \
 ## 5. Troubleshooting checklist
 
 ```bash
-# Restart only the backend service
-docker compose restart backend
-
-# Run if you change code or dependencies
-docker compose up --build -d backend
-
-# Run if you want to restart full (backend + frontend)
-docker compose down && docker compose up --build
-
-# delete mysql of docker
-docker volume rm $(docker volume ls -q)
-
-# Stop and remove all containers
-docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
-
-# Remove all unused Docker resources (containers, images, networks, volumes)
-docker system prune -a --volumes
-
-# Optional: remove all volumes only
-docker volume prune -f
-
-# Optional: remove all networks only
-docker network prune -f
+docker compose restart backend              # restart API without touching others
+docker compose up -d --build backend        # rebuild/restart API after dependency changes
+docker compose up -d --build frontend       # rebuild the Next.js app only
+docker compose restart reverb               # restart websocket server
+docker compose down                         # stop all services
+docker compose down -v                      # stop everything and drop volumes
+docker system prune -a --volumes            # nuke unused Docker resources (careful!)
 ```
 
 - `.env` files match the documented values (APP_URL, SESSION_*, SANCTUM_STATEFUL_DOMAINS, FRONTEND_URL)

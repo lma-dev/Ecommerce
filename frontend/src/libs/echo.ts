@@ -4,7 +4,7 @@ import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import { getSession } from 'next-auth/react'
 
-type EchoInstance = Echo<'pusher'>
+type EchoInstance = Echo<'reverb'>
 
 declare global {
   interface Window {
@@ -16,30 +16,43 @@ declare global {
 export function getEcho(): EchoInstance | null {
   if (typeof window === 'undefined') return null
 
-  const key = process.env.NEXT_PUBLIC_PUSHER_KEY as string | undefined
-  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string | undefined
-  if (!key || !cluster) return null
+  const key = process.env.NEXT_PUBLIC_REVERB_KEY as string | undefined
+  const wsHost = process.env.NEXT_PUBLIC_REVERB_HOST as string | undefined
+  const wsPort = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 443)
+  const forceTLS =
+    String(process.env.NEXT_PUBLIC_REVERB_FORCE_TLS ?? 'true').toLowerCase() === 'true'
+  if (!key || !wsHost) return null
 
   if (!window.__app_echo) {
     window.Pusher = Pusher
 
     const useTokenAuth =
       String(process.env.NEXT_PUBLIC_ECHO_TOKEN_AUTH || '').toLowerCase() === 'true'
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL as string | undefined
+    const authEndpoint =
+      (process.env.NEXT_PUBLIC_REVERB_AUTH_ENDPOINT as string | undefined) ||
+      (process.env.NEXT_PUBLIC_BACKEND_URL
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/broadcasting/auth`
+        : undefined)
     const baseConfig: any = {
-      broadcaster: 'pusher',
+      broadcaster: 'reverb',
       key,
-      cluster,
-      forceTLS: true,
+      forceTLS,
+      wsHost,
+      wsPort,
+      wssPort: wsPort,
+      enabledTransports: ['ws', 'wss'],
     }
-    if (useTokenAuth && backendUrl) {
+    if (authEndpoint) {
+      baseConfig.authEndpoint = authEndpoint
+    }
+    if (useTokenAuth && authEndpoint) {
       baseConfig.authorizer = (channel: any) => {
         return {
           authorize: async (socketId: string, callback: any) => {
             try {
               const session = await getSession()
               const token = (session as any)?.user?.token as string | undefined
-              const res = await fetch(`${backendUrl}/broadcasting/auth`, {
+              const res = await fetch(authEndpoint, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -58,7 +71,7 @@ export function getEcho(): EchoInstance | null {
         }
       }
     }
-    window.__app_echo = new Echo<'pusher'>(baseConfig)
+    window.__app_echo = new Echo<'reverb'>(baseConfig)
   }
 
   return window.__app_echo!

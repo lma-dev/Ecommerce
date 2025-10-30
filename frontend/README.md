@@ -8,7 +8,7 @@ A scalable frontend for the Yaung Kya Ml ecommerce platform. The app is built wi
 - ⚙️ Dedicated API client abstraction + TanStack Query caching.
 - 🧪 Zod validation for forms and server payloads.
 - 🎨 Tailwind CSS + shadcn/ui + Lucide icons.
-- 📡 Realtime updates via Pusher + Laravel Echo bridge.
+- 📡 Realtime updates via Laravel Reverb + Laravel Echo bridge.
 - ✍️ Typesafe alias-based imports.
 
 ---
@@ -17,7 +17,7 @@ A scalable frontend for the Yaung Kya Ml ecommerce platform. The app is built wi
 
 - **Framework:** Next.js 14 App Router (React Server Components hybrid).
 - **State / Data:** TanStack Query for API data, Zustand for light client state, React Context for auth/session.
-- **Data Flow:** REST requests via Axios → Laravel API. Subscriptions handled with Laravel Echo (Pusher transport).
+- **Data Flow:** REST requests via Axios → Laravel API. Subscriptions handled with Laravel Echo (Reverb transport).
 - **Rendering:** Locale segmented layouts under `app/[locale]`, leveraging Next.js nested routing and streaming.
 - **Validation:** Zod schemas shared between forms and API response guards.
 
@@ -75,7 +75,7 @@ tsconfig.json
 
 ## 🔌 Third-Party Services & Libraries
 
-- **Pusher** – Realtime order updates through Laravel Echo  
+- **Laravel Reverb** – Realtime order updates through Laravel Echo  
   https://pusher.com/
 - **Cloudinary** – Image upload & optimisation for catalogue assets  
   https://cloudinary.com/
@@ -103,17 +103,16 @@ pnpm dev
 ## 🐳 Docker
 
 ```bash
-# 1. Create your environment file (optional but recommended)
-cp .env.example .env.local
+# From repo root (after configuring backend/.env and frontend/.env)
+docker compose up -d --build frontend backend reverb mysql
 
-# 2. Build the production image
-docker build -t yaung-kya-ml .
-
-# 3. Run the container with your env vars and expose port 3000
-docker run --env-file .env.local -p 3000:3000 htain-thein-fe
+# Tail frontend logs
+docker compose logs -f frontend
 ```
 
-The container runs `pnpm start`, so it serves the pre-built app on port `3000`.
+- Next.js dev server lives at `http://localhost:3000`.  
+- API requests proxied to `http://localhost:8000`.  
+- Realtime events flow through the shared Reverb service on port `6001`.
 
 ---
 

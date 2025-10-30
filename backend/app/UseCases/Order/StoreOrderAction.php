@@ -52,8 +52,7 @@ class StoreOrderAction
 
             // Broadcast immediately for real-time admin dashboards (only if broadcaster available)
             $driver = config('broadcasting.default');
-            $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
-            if ($driver !== 'log' && $pusherReady) {
+            if ($driver !== 'log') {
                 event(new OrderCreated($order));
             }
 

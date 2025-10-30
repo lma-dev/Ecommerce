@@ -9,7 +9,7 @@ It exposes REST endpoints for the admin console and the customer storefront, han
 
 - **Framework:** Laravel 12 (RESTful HTTP API)
 - **Pattern Highlights:** Thin controllers → application “UseCase” actions, resource transformers, form request validation, and repository‑free Eloquent models.
-- **Runtime Services:** MySQL, Laravel Horizon/queue (optional), Pusher compatible broadcaster, Cloudinary uploads proxied via the frontend.
+- **Runtime Services:** MySQL, Laravel Horizon/queue (optional), Laravel Reverb broadcaster, Cloudinary uploads proxied via the frontend.
 
 ## Design Patterns
 
@@ -45,7 +45,7 @@ tests/
 
 ## Third-Party Services & Libraries
 
-- **Pusher** – WebSocket broadcasting for order updates  
+- **Laravel Reverb** – WebSocket broadcasting for order updates  
   https://pusher.com/
 - **Laravel Echo** – JavaScript client consumed by the frontend for realtime events  
   https://laravel.com/docs/broadcasting#client
@@ -67,11 +67,13 @@ php artisan serve
 ### Using Docker
 
 ```bash
-docker compose up -d
-docker compose exec backend php artisan migrate --seed
+# From /backend
+docker compose up -d --build app queue reverb nginx mysql
+docker compose exec app php artisan migrate --seed
 ```
 
-API base URL: `http://localhost:8000`
+- API base URL: `http://localhost:8000`
+- Reverb websockets (proxied by Nginx): `ws://localhost:8000` (upgrade route `/`)
 
 ## Testing
 
