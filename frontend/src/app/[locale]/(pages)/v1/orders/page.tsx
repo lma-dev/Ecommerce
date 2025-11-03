@@ -57,8 +57,8 @@ function RealtimeStatusNote() {
   return (
     <div className="text-[12px] text-muted-foreground">
       Realtime: Listens on channel <code>orders</code>. Configure via
-      <code> NEXT_PUBLIC_PUSHER_ORDERS_CHANNEL</code> and optional
-      <code> NEXT_PUBLIC_PUSHER_EXTRA_CHANNEL/NEXT_PUBLIC_PUSHER_EXTRA_EVENT</code> for testing.
+      <code> NEXT_PUBLIC_REVERB_ORDERS_CHANNEL</code> and optional
+      <code> NEXT_PUBLIC_REVERB_EXTRA_CHANNEL/NEXT_PUBLIC_REVERB_EXTRA_EVENT</code> for testing.
     </div>
   );
 }

@@ -55,7 +55,7 @@ export const useOrdersQuery = (page: number, filters: OrderFilters = {}) =>
     queryKey: ['orders', page, filters],
     queryFn: () => fetchOrders(page, filters),
     placeholderData: (prev) => prev,
-    // Realtime via Pusher; disable polling
+    // Realtime via Reverb; disable polling
     refetchInterval: false,
     staleTime: 30_000,
   })
@@ -78,7 +78,7 @@ export const useOrderQuery = (id: number) =>
     queryKey: ['order', id],
     queryFn: () => fetchOrder(id),
     enabled: !!id,
-    // Realtime via Pusher; disable polling
+    // Realtime via Reverb; disable polling
     refetchInterval: false,
     staleTime: 30_000,
   })

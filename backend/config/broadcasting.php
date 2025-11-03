@@ -2,22 +2,20 @@
 
 return [
 
-    'default' => env('BROADCAST_DRIVER', 'log'),
+    'default' => env('BROADCAST_CONNECTION', env('BROADCAST_DRIVER', 'reverb')),
 
     'connections' => [
 
-        'pusher' => [
-            'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
+        'reverb' => [
+            'driver' => 'reverb',
+            'key' => env('REVERB_APP_KEY'),
+            'secret' => env('REVERB_APP_SECRET'),
+            'app_id' => env('REVERB_APP_ID'),
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
-                // Fall back if env value exists but is empty
-                'host' => env('PUSHER_HOST') ?: ('api-'.(env('PUSHER_APP_CLUSTER', 'mt1')).'.pusher.com'),
-                'port' => env('PUSHER_PORT') ?: 443,
-                'scheme' => env('PUSHER_SCHEME') ?: 'https',
-                'useTLS' => (env('PUSHER_SCHEME') ?: 'https') === 'https',
+                'host' => env('REVERB_HOST'),
+                'port' => (int) env('REVERB_PORT', 443),
+                'scheme' => env('REVERB_SCHEME', 'https'),
+                'useTLS' => filter_var(env('REVERB_USE_TLS', true), FILTER_VALIDATE_BOOL),
             ],
         ],
 

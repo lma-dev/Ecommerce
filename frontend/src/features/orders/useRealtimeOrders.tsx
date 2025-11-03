@@ -35,15 +35,19 @@ type RealtimeOpts = {
 export function useRealtimeOrders(opts?: RealtimeOpts) {
   const qc = useQueryClient();
 
-  const key = process.env.NEXT_PUBLIC_PUSHER_KEY as string | undefined;
-  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string | undefined;
+  const key = process.env.NEXT_PUBLIC_REVERB_KEY as string | undefined;
+  const wsHost = process.env.NEXT_PUBLIC_REVERB_HOST as string | undefined;
+  const wsPort = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 443);
+  const forceTLS =
+    String(process.env.NEXT_PUBLIC_REVERB_FORCE_TLS ?? "true").toLowerCase() ===
+    "true";
   const channelName =
-    (process.env.NEXT_PUBLIC_PUSHER_ORDERS_CHANNEL as string | undefined) ||
+    (process.env.NEXT_PUBLIC_REVERB_ORDERS_CHANNEL as string | undefined) ||
     "orders";
-  const extraChannel = process.env.NEXT_PUBLIC_PUSHER_EXTRA_CHANNEL as
+  const extraChannel = process.env.NEXT_PUBLIC_REVERB_EXTRA_CHANNEL as
     | string
     | undefined;
-  const extraEvent = process.env.NEXT_PUBLIC_PUSHER_EXTRA_EVENT as
+  const extraEvent = process.env.NEXT_PUBLIC_REVERB_EXTRA_EVENT as
     | string
     | undefined;
   const debug =
@@ -74,7 +78,7 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!key || !cluster) return; // no-op if not configured
+    if (!key || !wsHost) return; // no-op if not configured
     if (!enablePrivate) {
       if (debug)
         console.warn(
@@ -122,7 +126,7 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
       ch.listen(".App\\Events\\OrderDeleted", handle);
     };
 
-    let echoInstance: Echo<"pusher"> | null = null;
+    let echoInstance: Echo<"reverb"> | null = null;
     const subscribedChannels = new Set<string>();
     let cancelled = false;
     let sanctumReady = !!readCookie(sanctumCookieName);
@@ -135,7 +139,7 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
     };
 
     const authEndpoint =
-      process.env.NEXT_PUBLIC_PUSHER_AUTH_ENDPOINT ||
+      process.env.NEXT_PUBLIC_REVERB_AUTH_ENDPOINT ||
       buildAuthEndpoint(
         process.env.NEXT_PUBLIC_BACKEND_URL as string | undefined
       ) ||
@@ -211,7 +215,7 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
 
       try {
         const log = String(
-          process.env.NEXT_PUBLIC_PUSHER_LOG || ""
+          process.env.NEXT_PUBLIC_REVERB_LOG || ""
         ).toLowerCase();
         if (log === "true" || log === "1" || log === "yes") {
           (Pusher as any).logToConsole = true;
@@ -246,11 +250,14 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
 
       if (cancelled) return;
 
-      const config: EchoOptions<"pusher"> = {
-        broadcaster: "pusher",
+      const config: EchoOptions<"reverb"> = {
+        broadcaster: "reverb",
         key,
-        cluster,
-        forceTLS: true,
+        forceTLS,
+        wsHost,
+        wsPort,
+        wssPort: wsPort,
+        enabledTransports: ["ws", "wss"],
         withCredentials: !hasBearer,
       };
 
@@ -329,7 +336,7 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
         });
       }
 
-      echoInstance = new Echo<"pusher">(config);
+      echoInstance = new Echo<"reverb">(config);
 
       const subscribeChannel = <
         T extends { listen: (event: string, cb: any) => T },
@@ -410,7 +417,9 @@ export function useRealtimeOrders(opts?: RealtimeOpts) {
     opts?.customerId,
     opts?.includeGlobalChannel,
     key,
-    cluster,
+    wsHost,
+    wsPort,
+    forceTLS,
     channelName,
     extraChannel,
     extraEvent,

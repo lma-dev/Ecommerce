@@ -67,11 +67,10 @@ class UpdateOrderAction
             $order = $order->load(['customer', 'products']);
 
             // Broadcast update for realtime clients (only if broadcaster available)
-            $driver = config('broadcasting.default');
-            $pusherReady = $driver !== 'pusher' || class_exists(\Pusher\Pusher::class);
-            if ($driver !== 'log' && $pusherReady) {
-                event(new OrderUpdated($order));
-            }
+        $driver = config('broadcasting.default');
+        if ($driver !== 'log') {
+            event(new OrderUpdated($order));
+        }
 
             return $order;
         });
