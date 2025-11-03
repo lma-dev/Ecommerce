@@ -96,6 +96,9 @@ pnpm install
 
 # Run development server
 pnpm dev
+
+# Run Storybook
+pnpm storybook
 ````
 
 ---
@@ -108,6 +111,10 @@ docker compose up -d --build frontend backend reverb mysql
 
 # Tail frontend logs
 docker compose logs -f frontend
+
+# Run Storybook in Docker (binds to http://localhost:6006)
+docker compose run --rm -p 6006:6006 frontend \
+  sh -c "corepack enable pnpm && pnpm install --config.allow-build=* && pnpm exec storybook dev -p 6006 --host 0.0.0.0"
 ```
 
 - Next.js dev server lives at `http://localhost:3000`.  

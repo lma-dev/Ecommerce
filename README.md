@@ -8,9 +8,6 @@ This project runs a Laravel 12 backend and a Next.js frontend side by side via D
 # Start API, frontend, Reverb, and MySQL containers (detached)
 docker compose up -d --build backend frontend reverb mysql
 
-# Tail logs (optional)
-docker compose logs -f backend
-
 # Run outstanding migrations (once services are healthy)
 docker compose exec backend php artisan migrate
 
@@ -57,6 +54,13 @@ docker compose exec backend php artisan migrate:fresh --seed
 ```bash
 # Lint (from frontend directory)
 pnpm lint
+
+# Run Storybook (from frontend directory)
+pnpm storybook
+
+# Run Storybook inside Docker (serves on http://localhost:6006)
+docker compose run --rm -p 6006:6006 frontend \
+  sh -c "corepack enable pnpm && pnpm install --config.allow-build=* && pnpm exec storybook dev -p 6006 --host 0.0.0.0"
 
 # Run build & surface TypeScript errors inside Docker
 docker compose run --rm frontend \
